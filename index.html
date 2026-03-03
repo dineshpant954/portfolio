@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dinesh Pant — Product Leader · AI/ML · Enterprise Tech</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --black: #080a0f; --surface: #0d1117; --surface2: #131920;
+    --border: rgba(255,255,255,0.07); --accent: #00e5a0;
+    --text: #e8edf5; --muted: #6b7a90; --dim: #3a4455;
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Syne', sans-serif; background: var(--black); color: var(--text); overflow-x: hidden; }
+  body::before { content:''; position:fixed; inset:0; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E"); opacity:.4; pointer-events:none; z-index:9999; }
+
+  nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:20px 60px; background:rgba(8,10,15,0.88); backdrop-filter:blur(20px); border-bottom:1px solid var(--border); }
+  .nav-logo { font-family:'DM Mono',monospace; font-size:13px; color:var(--accent); letter-spacing:0.15em; text-transform:uppercase; }
+  .nav-links { display:flex; gap:40px; list-style:none; }
+  .nav-links a { font-size:12px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); text-decoration:none; transition:color 0.2s; }
+  .nav-links a:hover { color:var(--text); }
+  .nav-cta { font-family:'DM Mono',monospace; font-size:11px; font-weight:500; letter-spacing:0.1em; text-transform:uppercase; color:var(--black); background:var(--accent); border:none; padding:9px 20px; cursor:pointer; text-decoration:none; }
+
+  .hero { min-height:100vh; display:flex; flex-direction:column; justify-content:flex-end; padding:0 60px 80px; position:relative; overflow:hidden; }
+  .hero-grid { position:absolute; inset:0; background-image:linear-gradient(rgba(0,229,160,0.03) 1px, transparent 1px),linear-gradient(90deg,rgba(0,229,160,0.03) 1px,transparent 1px); background-size:60px 60px; animation:gridFloat 20s ease infinite; }
+  @keyframes gridFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+  .hero-orb { position:absolute; width:700px; height:700px; border-radius:50%; background:radial-gradient(circle,rgba(0,229,160,0.07) 0%,transparent 70%); top:-200px; right:-100px; animation:orbPulse 8s ease-in-out infinite; }
+  @keyframes orbPulse { 0%,100%{transform:scale(1);opacity:.6} 50%{transform:scale(1.1);opacity:1} }
+  .hero-label { font-family:'DM Mono',monospace; font-size:11px; font-weight:500; letter-spacing:0.2em; text-transform:uppercase; color:var(--accent); margin-bottom:24px; opacity:0; animation:fadeUp 0.8s ease 0.2s forwards; }
+  .hero-name { font-family:'DM Serif Display',serif; font-size:clamp(56px,8vw,110px); line-height:0.95; letter-spacing:-0.02em; color:var(--text); margin-bottom:32px; opacity:0; animation:fadeUp 0.8s ease 0.4s forwards; }
+  .hero-name em { font-style:italic; color:var(--accent); }
+  .hero-tagline { max-width:640px; font-size:18px; font-weight:400; line-height:1.65; color:var(--muted); margin-bottom:48px; opacity:0; animation:fadeUp 0.8s ease 0.6s forwards; }
+  .hero-tagline strong { color:var(--text); }
+  .hero-actions { display:flex; gap:16px; align-items:center; opacity:0; animation:fadeUp 0.8s ease 0.8s forwards; }
+  .btn-primary { font-family:'DM Mono',monospace; font-size:12px; font-weight:500; letter-spacing:0.12em; text-transform:uppercase; color:var(--black); background:var(--accent); border:none; padding:14px 32px; cursor:pointer; text-decoration:none; transition:all 0.2s; display:inline-block; }
+  .btn-primary:hover { transform:translateY(-2px); box-shadow:0 8px 30px rgba(0,229,160,0.3); }
+  .btn-secondary { font-family:'DM Mono',monospace; font-size:12px; font-weight:500; letter-spacing:0.12em; text-transform:uppercase; color:var(--text); background:transparent; border:1px solid var(--border); padding:14px 32px; cursor:pointer; text-decoration:none; transition:all 0.2s; display:inline-block; }
+  .btn-secondary:hover { border-color:var(--muted); }
+  .hero-stats { position:absolute; right:60px; bottom:80px; display:flex; flex-direction:column; gap:28px; opacity:0; animation:fadeUp 0.8s ease 1s forwards; }
+  .stat-item { text-align:right; }
+  .stat-num { font-family:'DM Serif Display',serif; font-size:42px; color:var(--text); line-height:1; }
+  .stat-label { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; color:var(--muted); margin-top:4px; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+
+  .ticker { background:var(--surface); border-top:1px solid var(--border); border-bottom:1px solid var(--border); padding:14px 0; overflow:hidden; white-space:nowrap; }
+  .ticker-inner { display:inline-flex; animation:ticker 35s linear infinite; }
+  .ticker-item { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:0.15em; text-transform:uppercase; color:var(--muted); padding:0 40px; }
+  .ticker-item span { color:var(--accent); margin-right:8px; }
+  @keyframes ticker { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+  section { padding:100px 60px; }
+  .section-label { font-family:'DM Mono',monospace; font-size:10px; font-weight:500; letter-spacing:0.2em; text-transform:uppercase; color:var(--accent); margin-bottom:16px; }
+  .section-title { font-family:'DM Serif Display',serif; font-size:clamp(36px,5vw,58px); line-height:1.1; letter-spacing:-0.02em; color:var(--text); margin-bottom:60px; }
+  .section-title em { font-style:italic; color:var(--accent); }
+
+  #about { background:var(--surface); }
+  .about-grid { display:grid; grid-template-columns:1fr 1fr; gap:80px; align-items:start; }
+  .about-bio { font-size:17px; font-weight:400; line-height:1.8; color:var(--muted); }
+  .about-bio strong { color:var(--text); font-weight:700; }
+  .about-bio p+p { margin-top:24px; }
+  .about-details { display:flex; flex-direction:column; gap:32px; }
+  .detail-title { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:var(--accent); margin-bottom:12px; }
+  .company-list { display:flex; flex-direction:column; gap:10px; }
+  .company-item { display:flex; align-items:flex-start; gap:12px; font-size:15px; font-weight:700; color:var(--text); }
+  .company-dot { width:6px; height:6px; border-radius:50%; background:var(--accent); flex-shrink:0; margin-top:6px; }
+  .company-role { font-weight:400; color:var(--muted); font-size:13px; }
+  .cert-list { display:flex; flex-wrap:wrap; gap:8px; }
+  .cert-tag { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--accent); border:1px solid rgba(0,229,160,0.3); padding:5px 12px; }
+
+  #impact { background:var(--black); padding:0; }
+  .impact-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:2px; }
+  .impact-card { background:var(--surface); padding:40px 28px; text-align:center; }
+  .impact-num { font-family:'DM Serif Display',serif; font-size:44px; color:var(--accent); line-height:1; margin-bottom:10px; }
+  .impact-label { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); line-height:1.5; }
+
+  #experience { background:var(--black); }
+  .exp-timeline { display:flex; flex-direction:column; }
+  .exp-item { display:grid; grid-template-columns:200px 1fr; gap:40px; padding:44px 0; border-bottom:1px solid var(--border); }
+  .exp-item:last-child { border-bottom:none; }
+  .exp-date { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); padding-top:4px; }
+  .exp-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; gap:12px; flex-wrap:wrap; }
+  .exp-role { font-size:20px; font-weight:700; color:var(--text); }
+  .exp-company { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--black); background:var(--accent); padding:4px 12px; flex-shrink:0; }
+  .exp-bullets { margin-top:14px; display:flex; flex-direction:column; gap:10px; list-style:none; }
+  .exp-bullets li { font-size:14px; line-height:1.7; color:var(--muted); padding-left:22px; position:relative; }
+  .exp-bullets li::before { content:'→'; position:absolute; left:0; color:var(--accent); font-size:12px; top:1px; }
+  .exp-bullets li strong { color:var(--text); font-weight:700; }
+  .exp-tags { display:flex; flex-wrap:wrap; gap:8px; margin-top:18px; }
+  .exp-tag { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.08em; color:var(--dim); border:1px solid var(--dim); padding:3px 10px; }
+
+  #projects { background:var(--surface); }
+  .projects-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:2px; }
+  .project-card { background:var(--surface2); padding:40px; position:relative; overflow:hidden; transition:background 0.3s; }
+  .project-card:hover { background:#1a2230; }
+  .project-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--accent),transparent); transform:scaleX(0); transform-origin:left; transition:transform 0.4s ease; }
+  .project-card:hover::before { transform:scaleX(1); }
+  .project-num { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:0.15em; color:var(--dim); margin-bottom:20px; }
+  .project-title { font-family:'DM Serif Display',serif; font-size:24px; line-height:1.2; color:var(--text); margin-bottom:14px; }
+  .project-desc { font-size:14px; line-height:1.75; color:var(--muted); margin-bottom:28px; }
+  .project-metric { display:flex; align-items:baseline; gap:10px; font-family:'DM Mono',monospace; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--accent); border-top:1px solid var(--border); padding-top:20px; }
+  .project-metric strong { font-family:'DM Serif Display',serif; font-size:32px; color:var(--accent); line-height:1; }
+  .project-type { position:absolute; top:24px; right:24px; font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.15em; text-transform:uppercase; color:var(--dim); }
+
+  .project-card.featured { grid-column:span 2; display:grid; grid-template-columns:1fr 1fr; gap:60px; align-items:start; background:linear-gradient(135deg,var(--surface2) 0%,rgba(0,229,160,0.04) 100%); }
+  .featured-badge { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.2em; text-transform:uppercase; color:var(--black); background:var(--accent); padding:4px 12px; display:inline-block; margin-bottom:20px; }
+  .featured-title { font-family:'DM Serif Display',serif; font-size:32px; line-height:1.15; color:var(--text); margin-bottom:18px; }
+  .featured-desc { font-size:15px; line-height:1.75; color:var(--muted); }
+  .featured-metrics { display:flex; gap:32px; margin-top:28px; }
+  .fm-num { font-family:'DM Serif Display',serif; font-size:36px; color:var(--accent); line-height:1; }
+  .fm-label { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); margin-top:4px; }
+  .featured-modules { display:flex; flex-direction:column; gap:14px; }
+  .module-item { background:rgba(255,255,255,0.03); border:1px solid var(--border); padding:18px 20px; }
+  .module-num { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.15em; color:var(--accent); margin-bottom:5px; }
+  .module-title { font-size:14px; font-weight:700; color:var(--text); }
+  .module-desc { font-size:13px; color:var(--muted); margin-top:4px; line-height:1.5; }
+
+  #skills { background:var(--black); }
+  .skills-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:2px; }
+  .skill-category { background:var(--surface); padding:36px; }
+  .skill-cat-title { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:var(--accent); margin-bottom:24px; }
+  .skill-list { display:flex; flex-direction:column; gap:14px; }
+  .skill-name { font-size:14px; font-weight:700; color:var(--text); margin-bottom:6px; display:flex; justify-content:space-between; }
+  .skill-name span:last-child { color:var(--muted); font-family:'DM Mono',monospace; font-size:11px; font-weight:400; }
+  .skill-bar { height:2px; background:var(--dim); position:relative; overflow:hidden; }
+  .skill-fill { position:absolute; top:0; left:0; bottom:0; background:var(--accent); transform:scaleX(0); transform-origin:left; transition:transform 1s ease; }
+  .skill-fill.animated { transform:scaleX(1); }
+
+  #awards { background:var(--surface); }
+  .awards-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:2px; }
+  .award-card { background:var(--surface2); padding:36px; }
+  .award-icon { font-size:28px; margin-bottom:16px; }
+  .award-title { font-size:17px; font-weight:700; color:var(--text); margin-bottom:8px; }
+  .award-org { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--accent); margin-bottom:12px; }
+  .award-desc { font-size:13px; color:var(--muted); line-height:1.65; }
+
+  #contact { background:var(--black); text-align:center; padding:120px 60px; position:relative; }
+  #contact::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at center,rgba(0,229,160,0.04) 0%,transparent 65%); }
+  .contact-inner { position:relative; max-width:700px; margin:0 auto; }
+  .contact-title { font-family:'DM Serif Display',serif; font-size:clamp(42px,6vw,70px); line-height:1.05; letter-spacing:-0.02em; color:var(--text); margin-bottom:24px; }
+  .contact-title em { font-style:italic; color:var(--accent); }
+  .contact-sub { font-size:16px; color:var(--muted); line-height:1.65; margin-bottom:48px; }
+  .contact-links { display:flex; gap:14px; justify-content:center; flex-wrap:wrap; }
+  .contact-link { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--text); border:1px solid var(--border); padding:12px 28px; text-decoration:none; transition:all 0.2s; display:flex; align-items:center; gap:8px; }
+  .contact-link:hover { border-color:var(--accent); color:var(--accent); }
+
+  footer { background:var(--surface); border-top:1px solid var(--border); padding:24px 60px; display:flex; justify-content:space-between; align-items:center; }
+  .footer-copy { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.12em; color:var(--muted); }
+  .footer-edu span { color:var(--accent); }
+  .footer-edu { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.12em; color:var(--muted); }
+
+  .reveal { opacity:0; transform:translateY(40px); transition:opacity 0.8s ease,transform 0.8s ease; }
+  .reveal.visible { opacity:1; transform:translateY(0); }
+
+  @media(max-width:900px){
+    nav{padding:16px 24px;} .nav-links{display:none;}
+    section{padding:60px 24px;} .hero{padding:0 24px 60px;} .hero-stats{display:none;}
+    .about-grid,.exp-item,.projects-grid,.skills-grid,.awards-grid,.impact-grid{grid-template-columns:1fr;}
+    .project-card.featured{grid-column:span 1;grid-template-columns:1fr;}
+    .featured-metrics{flex-wrap:wrap;gap:20px;}
+    footer{flex-direction:column;gap:8px;text-align:center;}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">DP · Portfolio</div>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#awards">Awards</a></li>
+  </ul>
+  <a href="mailto:dpant@iu.edu" class="nav-cta">Let's Talk →</a>
+</nav>
+
+<section class="hero" id="home">
+  <div class="hero-grid"></div>
+  <div class="hero-orb"></div>
+  <div class="hero-label">Product Leader · AI/ML · Enterprise Tech · Kelley MBA '26</div>
+  <h1 class="hero-name">Dinesh<br><em>Pant</em></h1>
+  <p class="hero-tagline">
+    <strong>6+ years</strong> building at the intersection of strategy, engineering, and AI.
+    From shipping airline platforms for 35 carriers at Amadeus to RAG agents that eliminated 90% of analyst hours at Vertiv —
+    I turn ambiguous, high-stakes problems into products with real business impact.
+  </p>
+  <div class="hero-actions">
+    <a href="#projects" class="btn-primary">View Projects</a>
+    <a href="#contact" class="btn-secondary">Get In Touch</a>
+  </div>
+  <div class="hero-stats">
+    <div class="stat-item"><div class="stat-num">$20M+</div><div class="stat-label">Revenue Impact</div></div>
+    <div class="stat-item"><div class="stat-num">90%</div><div class="stat-label">Analyst Hours Saved</div></div>
+    <div class="stat-item"><div class="stat-num">$500M</div><div class="stat-label">Market Opp. Identified</div></div>
+  </div>
+</section>
+
+<div class="ticker">
+  <div class="ticker-inner">
+    <span class="ticker-item"><span>◆</span>Product Strategy</span>
+    <span class="ticker-item"><span>◆</span>RAG / Agentic AI</span>
+    <span class="ticker-item"><span>◆</span>Technical PM</span>
+    <span class="ticker-item"><span>◆</span>B2B Enterprise</span>
+    <span class="ticker-item"><span>◆</span>$500M Market Opportunity</span>
+    <span class="ticker-item"><span>◆</span>Cloud Architecture</span>
+    <span class="ticker-item"><span>◆</span>GTM Strategy</span>
+    <span class="ticker-item"><span>◆</span>SAFe® Scrum Master</span>
+    <span class="ticker-item"><span>◆</span>Full-Tuition Merit Fellow</span>
+    <span class="ticker-item"><span>◆</span>35 Airlines Onboarded</span>
+    <span class="ticker-item"><span>◆</span>Product Strategy</span>
+    <span class="ticker-item"><span>◆</span>RAG / Agentic AI</span>
+    <span class="ticker-item"><span>◆</span>Technical PM</span>
+    <span class="ticker-item"><span>◆</span>B2B Enterprise</span>
+    <span class="ticker-item"><span>◆</span>$500M Market Opportunity</span>
+    <span class="ticker-item"><span>◆</span>Cloud Architecture</span>
+    <span class="ticker-item"><span>◆</span>GTM Strategy</span>
+    <span class="ticker-item"><span>◆</span>SAFe® Scrum Master</span>
+    <span class="ticker-item"><span>◆</span>Full-Tuition Merit Fellow</span>
+    <span class="ticker-item"><span>◆</span>35 Airlines Onboarded</span>
+  </div>
+</div>
+
+<section id="about">
+  <div class="section-label">// 01 · About</div>
+  <h2 class="section-title reveal">The person<br>behind the <em>product</em></h2>
+  <div class="about-grid reveal">
+    <div class="about-bio">
+      <p>I'm a <strong>technology consultant and product leader</strong> with 6+ years solving complex business problems at the intersection of strategy and engineering. My path from software engineer to PM gives me an unusual edge: I can read a codebase and a P&L with equal fluency.</p>
+      <p>Currently completing my <strong>MBA at Indiana University's Kelley School of Business</strong> on a full-tuition merit fellowship — concentrating in Finance and Marketing & Strategy. I serve as <strong>VP of both the Tech Club and Consulting Academy</strong>, and have won back-to-back case competitions including Deloitte and Me Inc.</p>
+      <p>My sweet spot is <strong>AI/ML product strategy in enterprise environments</strong> — where technical architecture decisions connect directly to board-level outcomes. I've done it at scale: 35 airline clients, $20M+ revenue impact, and a live RAG agent pilot that saved 90% of analyst hours.</p>
+    </div>
+    <div class="about-details">
+      <div>
+        <div class="detail-title">// Experience At</div>
+        <div class="company-list">
+          <div class="company-item"><div class="company-dot"></div><div><div>Vertiv</div><div class="company-role">PM Intern · AI & Data Infrastructure</div></div></div>
+          <div class="company-item"><div class="company-dot"></div><div><div>Microsoft</div><div class="company-role">MBA Consultant · B2B Cybersecurity GTM</div></div></div>
+          <div class="company-item"><div class="company-dot"></div><div><div>Beats by Dre</div><div class="company-role">Strategic Consultant · Market Expansion</div></div></div>
+          <div class="company-item"><div class="company-dot"></div><div><div>Amadeus Labs</div><div class="company-role">SWE → APM → PM · Global Travel Tech</div></div></div>
+        </div>
+      </div>
+      <div>
+        <div class="detail-title">// Education</div>
+        <div class="company-list">
+          <div class="company-item"><div class="company-dot"></div><div><div>Indiana University — Kelley School</div><div class="company-role">MBA · Finance + Marketing & Strategy · May 2026 · Full-Tuition Merit Fellow</div></div></div>
+          <div class="company-item"><div class="company-dot"></div><div><div>Maharashtra Institute of Technology</div><div class="company-role">B.E. Computer Science · Pune University · 2019</div></div></div>
+        </div>
+      </div>
+      <div>
+        <div class="detail-title">// Certifications</div>
+        <div class="cert-list">
+          <span class="cert-tag">SAFe® 5 Scrum Master</span>
+          <span class="cert-tag">GenAI & ML for PMs</span>
+          <span class="cert-tag">SAP S/4HANA Cloud</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="impact">
+  <div class="impact-grid reveal">
+    <div class="impact-card"><div class="impact-num">90%</div><div class="impact-label">Analyst Hours Reduced via RAG Agent</div></div>
+    <div class="impact-card"><div class="impact-num">60%</div><div class="impact-label">Quote-to-Engineering Lead Time Cut</div></div>
+    <div class="impact-card"><div class="impact-num">$500M</div><div class="impact-label">Market Opportunity Identified at Microsoft</div></div>
+    <div class="impact-card"><div class="impact-num">$20M</div><div class="impact-label">YOY Portfolio Revenue Growth — Amadeus</div></div>
+    <div class="impact-card"><div class="impact-num">$2M</div><div class="impact-label">Annual Infrastructure Savings via Azure</div></div>
+  </div>
+</div>
+
+<section id="experience">
+  <div class="section-label">// 02 · Experience</div>
+  <h2 class="section-title reveal">Where I've<br>made an <em>impact</em></h2>
+  <div class="exp-timeline">
+
+    <div class="exp-item reveal">
+      <div class="exp-date">Jun – Aug 2025</div>
+      <div class="exp-content">
+        <div class="exp-header"><div class="exp-role">Product Manager Intern</div><div class="exp-company">Vertiv</div></div>
+        <ul class="exp-bullets">
+          <li>Built <strong>RAG-based AI agents</strong> automating data infrastructure market intelligence; pilot validated <strong>90% reduction in analyst hours</strong> and secured executive buy-in for enterprise-wide deployment.</li>
+          <li>Designed a <strong>single-source-of-truth platform</strong> integrating ERP, CPQ & CRM — eliminated manual handoffs and cut <strong>quote-to-engineering lead time by 60%</strong>; presented architecture to executives.</li>
+          <li>Conducted market opportunity assessment across critical data infrastructure segments, synthesizing competitive benchmarking and internal data to prioritize highest-ROI product development paths.</li>
+        </ul>
+        <div class="exp-tags"><span class="exp-tag">RAG / LLM</span><span class="exp-tag">Agentic AI</span><span class="exp-tag">ERP / CRM</span><span class="exp-tag">Market Intelligence</span><span class="exp-tag">Executive Presentations</span></div>
+      </div>
+    </div>
+
+    <div class="exp-item reveal">
+      <div class="exp-date">Jan – May 2025</div>
+      <div class="exp-content">
+        <div class="exp-header"><div class="exp-role">MBA Consultant</div><div class="exp-company">Microsoft</div></div>
+        <ul class="exp-bullets">
+          <li>Identified a <strong>$500M market opportunity</strong> for a new B2B cybersecurity product via market segmentation analysis.</li>
+          <li>Developed and presented a <strong>multi-channel GTM strategy</strong> to senior stakeholders, minimizing execution risk for entry in a high-growth sector.</li>
+        </ul>
+        <div class="exp-tags"><span class="exp-tag">Market Segmentation</span><span class="exp-tag">B2B Cybersecurity</span><span class="exp-tag">GTM Strategy</span><span class="exp-tag">Financial Modeling</span></div>
+      </div>
+    </div>
+
+    <div class="exp-item reveal">
+      <div class="exp-date">Sep – Oct 2024</div>
+      <div class="exp-content">
+        <div class="exp-header"><div class="exp-role">Strategic Consultant</div><div class="exp-company">Beats by Dre</div></div>
+        <ul class="exp-bullets">
+          <li>Built financial models and market analysis for a new product segment; GTM & penetration strategy projected <strong>8% YOY revenue growth</strong>.</li>
+          <li>Synthesized industry trends and consumer insights, delivering final strategy to senior stakeholders.</li>
+        </ul>
+        <div class="exp-tags"><span class="exp-tag">Consumer Electronics</span><span class="exp-tag">Financial Modeling</span><span class="exp-tag">GTM</span><span class="exp-tag">Consumer Insights</span></div>
+      </div>
+    </div>
+
+    <div class="exp-item reveal">
+      <div class="exp-date">2019 – 2024</div>
+      <div class="exp-content">
+        <div class="exp-header"><div class="exp-role">SWE → APM → Product Manager</div><div class="exp-company">Amadeus Labs</div></div>
+        <ul class="exp-bullets">
+          <li>Developed 3-year AI capability product strategy with executive business case — drove adoption by <strong>35 airlines</strong> and <strong>15% top-line growth</strong>.</li>
+          <li>Led 80-client data analytics portfolio across 12-person team; delivered <strong>$20M YOY revenue increase</strong> via demand-forecasting models.</li>
+          <li>Launched crowdsourced "Bug Bounty Day" security program — reduced customer-facing security incidents by <strong>90%</strong>.</li>
+          <li>Delivered airline loyalty program <strong>3 months ahead of schedule</strong>, saving $100K and generating <strong>$2.5M in new customer acquisition</strong> (Southwest, Air Canada).</li>
+          <li>Led on-prem-to-cloud Azure migration — achieved <strong>45% faster deployments</strong> and <strong>$2M annual infrastructure savings</strong>.</li>
+        </ul>
+        <div class="exp-tags"><span class="exp-tag">Travel Tech</span><span class="exp-tag">AI Strategy</span><span class="exp-tag">Azure Cloud</span><span class="exp-tag">Data Analytics</span><span class="exp-tag">Loyalty Programs</span><span class="exp-tag">Security</span></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section id="projects">
+  <div class="section-label">// 03 · Projects</div>
+  <h2 class="section-title reveal">What I've<br><em>built</em></h2>
+  <div class="projects-grid">
+
+    <div class="project-card featured reveal">
+      <div>
+        <div class="featured-badge">Featured · Vertiv Internship</div>
+        <div class="featured-title">Agentic AI Portfolio: Data Consolidation → Autonomous Workflows</div>
+        <div class="featured-desc">Four enterprise AI solutions built on real Vertiv pain points — transforming siloed, manual operations into autonomous intelligent workflows. Each module was scoped with stakeholders, piloted, and validated with hard metrics.</div>
+        <div class="featured-metrics">
+          <div><div class="fm-num">90%</div><div class="fm-label">Analyst Hours Saved</div></div>
+          <div><div class="fm-num">60%</div><div class="fm-label">Lead Time Cut</div></div>
+          <div><div class="fm-num">✓</div><div class="fm-label">Exec Buy-In</div></div>
+        </div>
+      </div>
+      <div class="featured-modules">
+        <div class="module-item"><div class="module-num">MODULE 01</div><div class="module-title">Market Intelligence Agent</div><div class="module-desc">RAG-based AI replacing weeks of analyst research with real-time competitive synthesis across data infrastructure markets.</div></div>
+        <div class="module-item"><div class="module-num">MODULE 02</div><div class="module-title">Single Source of Truth Platform</div><div class="module-desc">Unified ERP + CPQ + CRM integration cutting quote-to-engineering cycle time by 60%.</div></div>
+        <div class="module-item"><div class="module-num">MODULE 03</div><div class="module-title">AI Proposal Drafting Agent</div><div class="module-desc">LLM-assisted RFP generation grounded in internal knowledge — compressing proposals from days to hours.</div></div>
+        <div class="module-item"><div class="module-num">MODULE 04</div><div class="module-title">Autonomous Invoice Processing</div><div class="module-desc">AI extraction, validation, and reconciliation eliminating manual AP bottlenecks across distributed operations.</div></div>
+      </div>
+    </div>
+
+    <div class="project-card reveal">
+      <div class="project-type">Microsoft · GTM</div>
+      <div class="project-num">002</div>
+      <div class="project-title">$500M Cybersecurity Market Opportunity</div>
+      <div class="project-desc">Identified and sized a $500M untapped B2B cybersecurity opportunity through deep market segmentation. Built a full multi-channel GTM strategy and presented to Microsoft senior stakeholders with executive-ready deliverables.</div>
+      <div class="project-metric"><strong>$500M</strong> Opportunity Sized</div>
+    </div>
+
+    <div class="project-card reveal">
+      <div class="project-type">Amadeus · AI Strategy</div>
+      <div class="project-num">003</div>
+      <div class="project-title">3-Year AI Capability Product Strategy</div>
+      <div class="project-desc">Built the complete executive business case and financial models for Amadeus's AI roadmap. Led cross-functional GTM execution resulting in adoption across 35 airlines and 15% top-line growth.</div>
+      <div class="project-metric"><strong>35</strong> Airlines Onboarded</div>
+    </div>
+
+    <div class="project-card reveal">
+      <div class="project-type">Amadeus · Security</div>
+      <div class="project-num">004</div>
+      <div class="project-title">Bug Bounty Day Security Program</div>
+      <div class="project-desc">Designed and launched Amadeus's first crowdsourced vulnerability program from scratch. Continuous iteration cut customer-facing security incidents by 90% — a 0→1 security product with no internal precedent.</div>
+      <div class="project-metric"><strong>90%</strong> Incidents Reduced</div>
+    </div>
+
+    <div class="project-card reveal">
+      <div class="project-type">Innovation · ML/CV</div>
+      <div class="project-num">005</div>
+      <div class="project-title">ML Navigation System for Visually Impaired</div>
+      <div class="project-desc">Self-initiated innovation project building a computer vision + ML navigation system for visually impaired users. Won Amadeus's Test Pilot Award for Innovation — recognized as the highest-impact internal innovation that year.</div>
+      <div class="project-metric"><strong>🏆</strong> Test Pilot Award</div>
+    </div>
+
+    <div class="project-card reveal">
+      <div class="project-type">Amadeus · Cloud</div>
+      <div class="project-num">006</div>
+      <div class="project-title">Azure Cloud Migration ($2M Savings)</div>
+      <div class="project-desc">Led on-prem-to-cloud migration using Azure Cloud Adoption Framework. Achieved 45% faster deployment speeds and $2M annual infrastructure cost reduction. Scaled microservices for 25% faster API load times across global airline competency centers.</div>
+      <div class="project-metric"><strong>$2M</strong> Annual Savings</div>
+    </div>
+
+  </div>
+</section>
+
+<section id="skills">
+  <div class="section-label">// 04 · Skills</div>
+  <h2 class="section-title reveal">What I<br>bring to the <em>table</em></h2>
+  <div class="skills-grid reveal">
+    <div class="skill-category">
+      <div class="skill-cat-title">// Product</div>
+      <div class="skill-list">
+        <div><div class="skill-name"><span>Product Strategy & Roadmapping</span><span>95%</span></div><div class="skill-bar"><div class="skill-fill" style="width:95%"></div></div></div>
+        <div><div class="skill-name"><span>GTM Strategy</span><span>92%</span></div><div class="skill-bar"><div class="skill-fill" style="width:92%"></div></div></div>
+        <div><div class="skill-name"><span>User Research & Discovery</span><span>87%</span></div><div class="skill-bar"><div class="skill-fill" style="width:87%"></div></div></div>
+        <div><div class="skill-name"><span>PRD & Technical Specs</span><span>93%</span></div><div class="skill-bar"><div class="skill-fill" style="width:93%"></div></div></div>
+        <div><div class="skill-name"><span>Stakeholder Management</span><span>94%</span></div><div class="skill-bar"><div class="skill-fill" style="width:94%"></div></div></div>
+      </div>
+    </div>
+    <div class="skill-category">
+      <div class="skill-cat-title">// Technical</div>
+      <div class="skill-list">
+        <div><div class="skill-name"><span>LLM / RAG / Agentic AI</span><span>88%</span></div><div class="skill-bar"><div class="skill-fill" style="width:88%"></div></div></div>
+        <div><div class="skill-name"><span>Python, Java, SQL, R, Scala</span><span>85%</span></div><div class="skill-bar"><div class="skill-fill" style="width:85%"></div></div></div>
+        <div><div class="skill-name"><span>Cloud Architecture (Azure)</span><span>83%</span></div><div class="skill-bar"><div class="skill-fill" style="width:83%"></div></div></div>
+        <div><div class="skill-name"><span>System Design / Microservices</span><span>82%</span></div><div class="skill-bar"><div class="skill-fill" style="width:82%"></div></div></div>
+        <div><div class="skill-name"><span>SAFe® Agile</span><span>92%</span></div><div class="skill-bar"><div class="skill-fill" style="width:92%"></div></div></div>
+      </div>
+    </div>
+    <div class="skill-category">
+      <div class="skill-cat-title">// Analytics & Business</div>
+      <div class="skill-list">
+        <div><div class="skill-name"><span>Financial Modeling</span><span>88%</span></div><div class="skill-bar"><div class="skill-fill" style="width:88%"></div></div></div>
+        <div><div class="skill-name"><span>Market Sizing & Segmentation</span><span>91%</span></div><div class="skill-bar"><div class="skill-fill" style="width:91%"></div></div></div>
+        <div><div class="skill-name"><span>Tableau / Power BI / QlikView</span><span>82%</span></div><div class="skill-bar"><div class="skill-fill" style="width:82%"></div></div></div>
+        <div><div class="skill-name"><span>Competitive Analysis</span><span>90%</span></div><div class="skill-bar"><div class="skill-fill" style="width:90%"></div></div></div>
+        <div><div class="skill-name"><span>Executive Communication</span><span>94%</span></div><div class="skill-bar"><div class="skill-fill" style="width:94%"></div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="awards">
+  <div class="section-label">// 05 · Recognition</div>
+  <h2 class="section-title reveal">Awards &<br><em>Achievements</em></h2>
+  <div class="awards-grid">
+    <div class="award-card reveal"><div class="award-icon">🏆</div><div class="award-title">Deloitte Case Competition</div><div class="award-org">Kelley School · 1st Place</div><div class="award-desc">Won Deloitte's MBA case competition — delivered a business strategy recommendation to a panel of Deloitte executives with financial models and board-level storytelling under time pressure.</div></div>
+    <div class="award-card reveal"><div class="award-icon">🥇</div><div class="award-title">Me Inc. Competition</div><div class="award-org">Kelley School · Winner</div><div class="award-desc">Won the personal brand and career strategy competition judged by industry executives and MBA faculty at Indiana University's Kelley School.</div></div>
+    <div class="award-card reveal"><div class="award-icon">🚀</div><div class="award-title">Test Pilot Award for Innovation</div><div class="award-org">Amadeus Labs · Highest Innovation Award</div><div class="award-desc">Built an ML/computer vision navigation system for visually impaired users — a self-initiated project that earned Amadeus's highest internal innovation recognition.</div></div>
+    <div class="award-card reveal"><div class="award-icon">🎓</div><div class="award-title">Full-Tuition Merit Fellowship</div><div class="award-org">Indiana University · Kelley MBA</div><div class="award-desc">Awarded full-tuition merit fellowship — among the most competitive scholarships at Kelley, granted to incoming students with exceptional academic and professional records.</div></div>
+    <div class="award-card reveal"><div class="award-icon">💡</div><div class="award-title">VP — Tech Club & Consulting Academy</div><div class="award-org">Kelley School · Dual Leadership Roles</div><div class="award-desc">Elected VP of both Kelley's Tech Club and Consulting Academy — driving employer partnerships, recruiting events, and community programming across 300+ students.</div></div>
+    <div class="award-card reveal"><div class="award-icon">🌐</div><div class="award-title">Board Member — DEI & Innovation</div><div class="award-org">Amadeus Labs · Leadership</div><div class="award-desc">Served on Amadeus's DEI Belong Program board and Innovation Team — shaping culture, inclusive initiatives, and innovation strategy across the Bengaluru engineering center.</div></div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="contact-inner">
+    <div class="section-label" style="text-align:center">// 06 · Contact</div>
+    <h2 class="contact-title">Let's build<br>something <em>great</em></h2>
+    <p class="contact-sub">Actively seeking <strong>PM, Senior PM, TPM, and AI/ML PM roles</strong> at FAANG, growth-stage startups, and leading tech companies. Based in Bloomington, IN — open to relocation anywhere.</p>
+    <div class="contact-links">
+      <a href="mailto:dpant@iu.edu" class="contact-link">✉ dpant@iu.edu</a>
+      <a href="https://linkedin.com/in/dinesh-pant" class="contact-link" target="_blank">↗ LinkedIn</a>
+      <a href="tel:+18126712868" class="contact-link">📞 (812) 671-2868</a>
+      <a href="#" class="contact-link">↓ Resume PDF</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-copy">© 2026 Dinesh Pant · All rights reserved</div>
+  <div class="footer-edu">MBA · <span>Kelley School of Business</span> · May 2026 · Full-Tuition Merit Fellow</div>
+</footer>
+
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        entry.target.querySelectorAll('.skill-fill').forEach(bar => bar.classList.add('animated'));
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.nav-links a');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => { if (window.scrollY >= s.offsetTop - 100) current = s.getAttribute('id'); });
+    navLinks.forEach(l => { l.style.color = l.getAttribute('href') === '#' + current ? 'var(--text)' : ''; });
+  });
+</script>
+</body>
+</html>
