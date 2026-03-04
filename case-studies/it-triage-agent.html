@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Case Study: IT Support Ticket Triage & Resolution — Dinesh Pant</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Syne:wght@400;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --black: #080a0f; --surface: #0d1117; --surface2: #131920;
+    --border: rgba(255,255,255,0.07); --accent: #00e5a0;
+    --text: #e8edf5; --muted: #6b7a90; --dim: #3a4455;
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Syne', sans-serif; background: var(--black); color: var(--text); overflow-x: hidden; }
+  body::before { content:''; position:fixed; inset:0; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E"); opacity:.4; pointer-events:none; z-index:9999; }
+
+  .back-link { display:inline-flex; align-items:center; gap:8px; font-family:'DM Mono',monospace; font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); text-decoration:none; transition:color 0.2s; padding:24px 60px; }
+  .back-link:hover { color:var(--accent); }
+
+  .content { max-width:880px; margin:0 auto; padding:0 60px 80px; }
+
+  .page-header { padding:40px 0 60px; border-bottom:1px solid var(--border); margin-bottom:60px; }
+  .section-label { font-family:'DM Mono',monospace; font-size:10px; font-weight:500; letter-spacing:0.2em; text-transform:uppercase; color:var(--accent); margin-bottom:16px; }
+  .page-title { font-family:'DM Serif Display',serif; font-size:clamp(32px,4.5vw,52px); line-height:1.08; letter-spacing:-0.02em; color:var(--text); margin-bottom:12px; }
+  .page-title em { font-style:italic; color:var(--accent); }
+  .page-subtitle { font-family:'DM Mono',monospace; font-size:12px; letter-spacing:0.15em; text-transform:uppercase; color:var(--muted); }
+
+  /* TOC */
+  .toc { background:var(--surface); border:1px solid var(--border); padding:32px; margin-bottom:60px; }
+  .toc-title { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:var(--accent); margin-bottom:20px; }
+  .toc-list { list-style:none; display:flex; flex-direction:column; gap:10px; }
+  .toc-list a { font-size:14px; color:var(--muted); text-decoration:none; transition:color 0.2s; display:flex; align-items:baseline; gap:12px; }
+  .toc-list a:hover { color:var(--accent); }
+  .toc-num { font-family:'DM Mono',monospace; font-size:11px; color:var(--dim); min-width:24px; }
+
+  /* Sections */
+  .cs-section { margin-bottom:80px; scroll-margin-top:40px; }
+  .cs-section-num { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:var(--accent); margin-bottom:12px; }
+  .cs-section-title { font-family:'DM Serif Display',serif; font-size:clamp(24px,3vw,36px); line-height:1.15; color:var(--text); margin-bottom:24px; }
+  .cs-section-title em { font-style:italic; color:var(--accent); }
+
+  .cs-text { font-size:15px; line-height:1.85; color:var(--muted); margin-bottom:20px; }
+  .cs-text strong { color:var(--text); font-weight:700; }
+
+  .cs-subhead { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:0.15em; text-transform:uppercase; color:var(--accent); margin:32px 0 16px; }
+
+  /* Tables */
+  .cs-table-wrap { overflow-x:auto; margin:20px 0 28px; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--accent); background:var(--surface2); padding:12px 16px; text-align:left; border-bottom:2px solid var(--accent); white-space:nowrap; }
+  td { padding:12px 16px; border-bottom:1px solid var(--border); color:var(--muted); line-height:1.6; vertical-align:top; }
+  td strong { color:var(--text); font-weight:700; }
+  tr:hover td { background:rgba(0,229,160,0.02); }
+
+  /* Diagrams */
+  .cs-diagram { background:var(--surface); border:1px solid var(--border); padding:24px; margin:20px 0 28px; font-family:'JetBrains Mono','DM Mono',monospace; font-size:12px; line-height:2; color:var(--muted); overflow-x:auto; white-space:pre; }
+  .cs-diagram strong { color:var(--accent); font-weight:700; }
+  .cs-diagram em { color:var(--text); font-style:normal; }
+
+  /* Cards */
+  .cs-cards { display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:2px; margin:20px 0 28px; }
+  .cs-card { background:var(--surface); padding:24px; border-top:2px solid var(--accent); }
+  .cs-card-title { font-size:15px; font-weight:700; color:var(--text); margin-bottom:8px; }
+  .cs-card-text { font-size:13px; color:var(--muted); line-height:1.7; }
+
+  /* Two column */
+  .cs-two-col { display:grid; grid-template-columns:1fr 1fr; gap:2px; margin:20px 0 28px; }
+  .cs-col { background:var(--surface); padding:24px; }
+  .cs-col-label { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; margin-bottom:12px; }
+  .cs-col-label.before { color:var(--dim); }
+  .cs-col-label.after { color:var(--accent); }
+  .cs-col h4 { font-size:15px; color:var(--text); margin-bottom:8px; }
+  .cs-col p { font-size:13px; color:var(--muted); line-height:1.7; }
+  .cs-col ul { list-style:none; margin-top:8px; }
+  .cs-col li { font-size:13px; color:var(--muted); line-height:1.8; padding-left:18px; position:relative; }
+  .cs-col li::before { content:'→'; position:absolute; left:0; color:var(--accent); font-size:11px; }
+
+  /* Bullets */
+  .cs-bullets { list-style:none; margin:12px 0 20px; }
+  .cs-bullets li { font-size:14px; color:var(--muted); line-height:1.8; padding-left:20px; position:relative; margin-bottom:4px; }
+  .cs-bullets li::before { content:'→'; position:absolute; left:0; color:var(--accent); font-size:12px; }
+  .cs-bullets li strong { color:var(--text); }
+
+  /* Badges row */
+  .cs-badges { display:flex; flex-wrap:wrap; gap:8px; margin:16px 0 24px; }
+  .cs-badge { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--accent); border:1px solid rgba(0,229,160,0.3); padding:5px 14px; }
+
+  /* Links */
+  .page-bottom { padding:60px 0; display:flex; flex-direction:column; align-items:center; gap:24px; border-top:1px solid var(--border); }
+  .page-bottom-link { font-family:'DM Mono',monospace; font-size:12px; letter-spacing:0.1em; color:var(--muted); text-decoration:none; transition:color 0.2s; }
+  .page-bottom-link:hover { color:var(--accent); }
+
+  footer { background:var(--surface); border-top:1px solid var(--border); padding:24px 60px; display:flex; justify-content:space-between; align-items:center; }
+  .footer-copy { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.12em; color:var(--muted); }
+  .footer-edu span { color:var(--accent); }
+  .footer-edu { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.12em; color:var(--muted); }
+
+  @media(max-width:900px) {
+    .back-link { padding:16px 24px; }
+    .content { padding:0 24px 60px; }
+    .cs-two-col { grid-template-columns:1fr; }
+    .cs-cards { grid-template-columns:1fr; }
+    footer { flex-direction:column; gap:8px; text-align:center; padding:24px; }
+  }
+</style>
+</head>
+<body>
+
+<a href="../projects/it-triage-agent.html" class="back-link">← Back to Demo</a>
+
+<div class="content">
+
+  <div class="page-header">
+    <div class="section-label">// Case Study · Project 003</div>
+    <h1 class="page-title">IT Support Ticket Triage<br>& <em>Resolution</em></h1>
+    <div class="page-subtitle">Agentic AI · IT Ops · Full Case Study</div>
+  </div>
+
+  <!-- TABLE OF CONTENTS -->
+  <nav class="toc">
+    <div class="toc-title">// Table of Contents</div>
+    <ol class="toc-list">
+      <li><a href="#s1"><span class="toc-num">01</span> Hook & Problem Statement</a></li>
+      <li><a href="#s2"><span class="toc-num">02</span> Market Reality & Maturity Path</a></li>
+      <li><a href="#s3"><span class="toc-num">03</span> Discovery Pack</a></li>
+      <li><a href="#s4"><span class="toc-num">04</span> Solution Overview (One-Pager)</a></li>
+      <li><a href="#s5"><span class="toc-num">05</span> Workflow Design (Before/After)</a></li>
+      <li><a href="#s6"><span class="toc-num">06</span> Agentic System Design</a></li>
+      <li><a href="#s7"><span class="toc-num">07</span> Architecture</a></li>
+      <li><a href="#s8"><span class="toc-num">08</span> Build vs. Buy Matrix</a></li>
+      <li><a href="#s9"><span class="toc-num">09</span> Security, Privacy & Compliance</a></li>
+      <li><a href="#s10"><span class="toc-num">10</span> Evaluation & Metrics</a></li>
+      <li><a href="#s11"><span class="toc-num">11</span> Roadmap & Execution Plan</a></li>
+      <li><a href="#s12"><span class="toc-num">12</span> Portfolio Packaging</a></li>
+    </ol>
+  </nav>
+
+  <!-- SECTION 1 -->
+  <div class="cs-section" id="s1">
+    <div class="cs-section-num">// 01</div>
+    <h2 class="cs-section-title">Hook & Problem <em>Statement</em></h2>
+    <p class="cs-text">
+      Every enterprise runs on tickets. Password resets, VPN issues, software requests, access changes — <strong>10,000 to 100,000+ per month</strong> flowing through service desks that were designed for a pre-AI world. The economics are brutal: Tier-1 resolution costs <strong>~$22/ticket</strong>, but the moment something escalates to Tier-2 or Tier-3, costs jump to <strong>$55–$104+ per ticket</strong>. And yet, 40–60% of this volume is repetitive, pattern-matchable, and automatable — if you have an agent that can read, classify, reason, and act safely.
+    </p>
+    <p class="cs-text">
+      This isn't a chatbot that suggests KB articles. This is <strong>an agentic system that triages, retrieves knowledge with citations, executes safe resolutions autonomously, and escalates with full context when it can't</strong>. The core PM question: when should the agent act, and when should it hand off to a human?
+    </p>
+
+    <div class="cs-subhead">// Success Criteria</div>
+    <p class="cs-text">
+      Reduce ticket resolution cost by 30%+, cut MTTR from 4.2 hours to under 2 hours, achieve 30%+ deflection rate for Tier-1 volume — while maintaining or improving CSAT and passing security review.
+    </p>
+
+    <div class="cs-subhead">// Design Principles</div>
+    <div class="cs-table-wrap">
+      <table>
+        <thead><tr><th>Principle</th><th>What It Means</th><th>Why It Matters</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Security-First</strong></td><td>Least privilege for every tool call. Every action audited. PII masked in logs.</td><td>One bad auto-resolution can trigger a security incident. Trust is the product.</td></tr>
+          <tr><td><strong>Environment-Agnostic</strong></td><td>Adapter pattern for ITSM (ServiceNow, JSM, Zendesk), identity (Okta, Azure AD), endpoint (SCCM, Intune, Jamf).</td><td>No enterprise runs a single stack. The system must plug into what exists.</td></tr>
+          <tr><td><strong>Measurable ROI</strong></td><td>Every capability tied to a metric: deflection rate, MTTR, cost per ticket, CSAT.</td><td>AI without metrics is a science project. This needs to justify its own budget.</td></tr>
+          <tr><td><strong>Human Trust Ramp</strong></td><td>Copilot → HITL → Lights-out. Autonomy earned incrementally through measured performance.</td><td>Organizations don't flip a switch to autonomous AI. Trust builds through demonstrated reliability.</td></tr>
+          <tr><td><strong>Composable & Extensible</strong></td><td>Each agent is a modular unit. New intents, tools, and adapters added without rewriting core logic.</td><td>The system must grow with the org — new use cases, new tools, new policies.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SECTION 2 -->
+  <div class="cs-section" id="s2">
+    <div class="cs-section-num">// 02</div>
+    <h2 class="cs-section-title">Market Reality & <em>Maturity Path</em></h2>
+
+    <div class="cs-subhead">// What Enterprises Are Trying to Achieve</div>
+    <p class="cs-text">
+      Every major ITSM vendor is shipping AI capabilities: <strong>ServiceNow Now Assist</strong> embeds generative AI into workflows, <strong>Atlassian Rovo/JSM</strong> offers AI-powered virtual agents, <strong>Zendesk AI</strong> automates ticket routing and suggestions. Microsoft Copilot for Service, Google Vertex AI Agents, and Amazon Bedrock Agents are all entering the space. The market is moving from "should we use AI?" to "how fast can we deploy it safely?"
+    </p>
+
+    <div class="cs-subhead">// What Blocks Progression</div>
+    <ul class="cs-bullets">
+      <li><strong>KB quality debt:</strong> 40%+ of knowledge base articles are stale, duplicated, or incomplete. RAG is only as good as its retrieval corpus.</li>
+      <li><strong>Tool-execution risk:</strong> Auto-resolving a password reset is very different from auto-modifying Active Directory groups. Risk varies by 100x across intents.</li>
+      <li><strong>Security & compliance gaps:</strong> GRC teams need to audit every AI action. Most systems lack the observability infrastructure for this.</li>
+      <li><strong>Organizational adoption:</strong> L1 agents fear displacement. L2/L3 SMEs don't trust AI triage. Change management is as hard as the technology.</li>
+    </ul>
+
+    <div class="cs-subhead">// 4-Stage Maturity Ladder</div>
+    <div class="cs-table-wrap">
+      <table>
+        <thead><tr><th>Level</th><th>Name</th><th>AI Role</th><th>Human Role</th><th>Risk</th></tr></thead>
+        <tbody>
+          <tr><td><strong>L0</strong></td><td>Triage Assist</td><td>Classify & route</td><td>AI suggests, human decides</td><td>Lowest</td></tr>
+          <tr><td><strong>L1</strong></td><td>Agent Copilot</td><td>Suggest & draft</td><td>Agent reviews and sends</td><td>Low</td></tr>
+          <tr><td><strong>L2</strong></td><td>HITL Executor</td><td>Act with approval</td><td>AI proposes, human approves</td><td>Medium</td></tr>
+          <tr><td><strong>L3</strong></td><td>Lights-Out</td><td>Autonomous for safe intents</td><td>Policy-gated + audit trail</td><td>Managed</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SECTION 3 -->
+  <div class="cs-section" id="s3">
+    <div class="cs-section-num">// 03</div>
+    <h2 class="cs-section-title">Discovery <em>Pack</em></h2>
+
+    <div class="cs-subhead">// Personas</div>
+    <div class="cs-table-wrap">
+      <table>
+        <thead><tr><th>Persona</th><th>Job to Be Done</th><th>Pain Points</th></tr></thead>
+        <tbody>
+          <tr><td><strong>End User</strong></td><td>Get my issue fixed fast so I can get back to work</td><td>Long wait times, impersonal responses, having to repeat context across escalations</td></tr>
+          <tr><td><strong>L1 Agent</strong></td><td>Resolve tickets quickly with the right context</td><td>Repetitive work, missing KB articles, lack of context from requesters, constant swivel-chairing between tools</td></tr>
+          <tr><td><strong>L2/L3 SME</strong></td><td>Focus on complex issues, not routine noise</td><td>Poorly triaged escalations, missing diagnostic data, time wasted on issues that shouldn't reach them</td></tr>
+          <tr><td><strong>IT Manager</strong></td><td>Hit SLAs, reduce cost, prove ROI to leadership</td><td>Rising ticket volumes, flat headcount, inability to measure AI impact, fear of quality degradation</td></tr>
+          <tr><td><strong>SecOps / GRC</strong></td><td>Ensure AI actions are auditable, compliant, and safe</td><td>Lack of visibility into AI decisions, no audit trail for automated actions, PII exposure risk</td></tr>
+          <tr><td><strong>Platform Owner</strong></td><td>Deploy and maintain AI capabilities without breaking existing workflows</td><td>Integration complexity, vendor lock-in, lack of monitoring, unclear ownership boundaries</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="cs-subhead">// Current-State Workflow</div>
+    <div class="cs-diagram"><strong>User</strong> → Submits ticket (Slack/Email/Portal)
+  ↓
+<strong>ITSM Queue</strong> → Ticket lands in general queue
+  ↓
+<em>L1 Agent</em> → Reads ticket, searches KB (2-5 min)
+  ↓
+<em>L1 Agent</em> → Attempts resolution or escalates (5-30 min)
+  ↓
+<strong>Escalation?</strong> → If yes: re-assign, write notes, wait for L2 pickup (1-4 hours)
+  ↓
+<em>L2/L3 SME</em> → Re-reads ticket, re-diagnoses, resolves (30 min - 2 hours)
+  ↓
+<strong>Resolution</strong> → Close ticket, notify user
+
+<em>Average MTTR: 4.2 hours | Avg cost: $22/ticket | Escalation rate: ~35%</em></div>
+
+    <div class="cs-subhead">// Ticket Taxonomy</div>
+    <div class="cs-table-wrap">
+      <table>
+        <thead><tr><th>Category</th><th>Volume %</th><th>Automation Potential</th><th>Example Intents</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Access & Identity</strong></td><td>25–35%</td><td>High</td><td>Password reset, account unlock, MFA issues, access requests</td></tr>
+          <tr><td><strong>Connectivity</strong></td><td>10–15%</td><td>High</td><td>VPN issues, Wi-Fi, network drives, printer connectivity</td></tr>
+          <tr><td><strong>Software</strong></td><td>15–20%</td><td>Medium</td><td>Install requests, license issues, update/patch problems</td></tr>
+          <tr><td><strong>Hardware</strong></td><td>10–15%</td><td>Low</td><td>Laptop issues, peripheral failures, docking station problems</td></tr>
+          <tr><td><strong>Email & Collaboration</strong></td><td>8–12%</td><td>Medium</td><td>Outlook issues, Teams/Slack, calendar sync, shared mailbox</td></tr>
+          <tr><td><strong>Security</strong></td><td>3–5%</td><td>Low (escalate only)</td><td>Phishing reports, suspicious activity, data loss concerns</td></tr>
+          <tr><td><strong>Service Requests</strong></td><td>10–15%</td><td>Medium</td><td>New hire setup, role change, equipment request, offboarding</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="cs-subhead">// Opportunity Sizing</div>
+    <div class="cs-table-wrap">
+      <table>
+        <thead><tr><th>Metric</th><th>Current State</th><th>Target (12-Month)</th><th>Impact</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Monthly ticket volume</strong></td><td>12,000</td><td>12,000 (same inflow)</td><td>—</td></tr>
+          <tr><td><strong>Avg cost per ticket</strong></td><td>$22</td><td>$15</td><td>$84K/mo savings</td></tr>
+          <tr><td><strong>MTTR</strong></td><td>4.2 hours</td><td>1.8 hours</td><td>57% faster resolution</td></tr>
+          <tr><td><strong>Deflection rate</strong></td><td>~5% (self-service)</td><td>30%+</td><td>3,600+ tickets/mo auto-resolved</td></tr>
+          <tr><td><strong>Projected annual savings</strong></td><td>—</td><td>—</td><td><strong>$580K–$950K</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="cs-subhead">// Risk Register</div>
+    <div class="cs-table-wrap">
+      <table>
+        <thead><tr><th>Risk</th><th>Severity</th><th>Mitigation</th></tr></thead>
+        <tbody>
+          <tr><td><strong>KB 40% stale</strong></td><td>High</td><td>KB audit sprint in Week 1–2; freshness scoring in retrieval; flag low-confidence answers</td></tr>
+          <tr><td><strong>No LDAP API access</strong></td><td>Medium</td><td>Mock APIs for MVP; work with infra team on service account provisioning</td></tr>
+          <tr><td><strong>GRC review required</strong></td><td>High</td><td>Bake audit logging from Day 1; schedule GRC review in Week 3; threat model upfront</td></tr>
+          <tr><td><strong>L1 displacement fear</strong></td><td>Medium</td><td>Position as "copilot" not replacement; involve L1 agents in design; show how AI handles routine so they focus on complex</td></tr>
+          <tr><td><strong>PII in tickets</strong></td><td>High</td><td>PII detection + masking pipeline; no PII in LLM prompts; data retention policy alignment</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SECTION 4 -->
+  <div class="cs-section" id="s4">
+    <div class="cs-section-num">// 04</div>
+    <h2 class="cs-section-title">Solution Overview <em>(One-Pager)</em></h2>
+
+    <div class="cs-subhead">// What It Does</div>
+    <ul class="cs-bullets">
+      <li><strong>Intake & Classify:</strong> Accepts tickets from any channel (Slack, Email, Portal, Teams) and normalizes into a unified schema</li>
+      <li><strong>Smart Triage:</strong> Classifies intent, priority, and confidence using Claude API structured output in a single call</li>
+      <li><strong>Knowledge-Grounded Resolution:</strong> RAG retrieval from KB + past tickets with citations — never hallucinates a fix</li>
+      <li><strong>Tool Execution:</strong> Executes safe resolutions via APIs (Azure AD, Intune, Jamf) with rollback support and audit logging</li>
+      <li><strong>Agent Copilot:</strong> For non-auto-resolvable intents, drafts responses and proposes actions for human review</li>
+      <li><strong>Continuous Learning:</strong> Feedback loops update KB, retrain classifiers, and adjust confidence thresholds over time</li>
+    </ul>
+
+    <div class="cs-subhead">// What It Does NOT Do (Non-Goals)</div>
+    <ul class="cs-bullets">
+      <li>Replace L2/L3 specialists — complex issues always route to humans with full context</li>
+      <li>Auto-resolve security incidents — security intents are hardcoded to escalate, always</li>
+      <li>Modify production infrastructure — no access to prod systems, only IT support tools</li>
+      <li>Store or log PII — all PII masked before LLM processing, no PII in audit trails</li>
+      <li>Work without human oversight — even L3 "lights-out" has policy gates and audit trails</li>
+    </ul>
+
+    <div class="cs-subhead">// Value Propositions</div>
+    <div class="cs-cards">
+      <div class="cs-card">
+        <div class="cs-card-title">For End Users</div>
+        <div class="cs-card-text">Get your password reset in 47 seconds instead of 45 minutes. No more waiting in queue, no more repeating your issue to three different agents. The AI resolves routine issues instantly and routes complex ones with full context so the human who picks it up already knows your situation.</div>
+      </div>
+      <div class="cs-card">
+        <div class="cs-card-title">For IT Leadership</div>
+        <div class="cs-card-text">Reduce cost per ticket from $22 to $15. Cut MTTR by 57%. Deflect 30%+ of volume automatically. Every AI action is audited and policy-gated — you get the efficiency of automation with the governance your security team demands. ROI visible in Week 4.</div>
+      </div>
+      <div class="cs-card">
+        <div class="cs-card-title">For L1/L2 Agents</div>
+        <div class="cs-card-text">Stop doing password resets all day. The AI handles the routine so you can focus on the interesting, complex issues that actually need your expertise. When tickets do reach you, they arrive with full diagnostic context — no more detective work to figure out what the user actually needs.</div>
+      </div>
+    </div>
+
+    <div class="cs-subhead">// Differentiation: Naive Chatbot vs. This Design</div>
+    <div class="cs-table-wrap">
+      <table>
+        <thead><tr><th>Dimension</th><th>Typical IT Chatbot</th><th>This Agentic System</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Architecture</strong></td><td>Single LLM with prompt engineering</td><td>Multi-agent orchestration with specialized agents</td></tr>
+          <tr><td><strong>Knowledge</strong></td><td>Suggests KB articles (user searches)</td><td>RAG with citations — retrieves and applies knowledge</td></tr>
+          <tr><td><strong>Action</strong></td><td>None — "please contact IT"</td><td>Tool execution (unlock accounts, deploy software)</td></tr>
+          <tr><td><strong>Safety</strong></td><td>Best-effort content filtering</td><td>Policy-gated autonomy per intent + full audit trail</td></tr>
+          <tr><td><strong>Adoption</strong></td><td>Big-bang deployment</td><td>Trust ramp: copilot → HITL → lights-out</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SECTION 5 -->
+  <div class="cs-section" id="s5">
+    <div class="cs-section-num">// 05</div>
+    <h2 class="cs-section-title">Workflow Design <em>(Before/After)</em></h2>
+
+    <div class="cs-subhead">// 1. Password Reset</div>
+    <div class="cs-two-col">
+      <div class="cs-col">
+        <div class="cs-col-label before">Before — 15–45 min manual</div>
+        <h4>Manual Process</h4>
+        <ul>
+          <li>User submits ticket via email/portal</li>
+          <li>Ticket sits in queue (5–20 min)</li>
+          <li>L1 agent picks up, verifies identity manually</li>
+          <li>Agent navigates to Azure AD, resets password</li>
+          <li>Agent emails user the temp password</li>
+          <li>Agent closes ticket manually</li>
+        </ul>
+      </div>
+      <div class="cs-col">
+        <div class="cs-col-label after">After — 47 seconds lights-out</div>
+        <h4>Agent-Resolved (L3)</h4>
+        <ul>
+          <li>User messages Slack bot</li>
+          <li>Triage agent: account_unlock (97% confidence)</li>
+          <li>verify_identity → Okta Verify push (2s)</li>
+          <li>unlock_account → Azure AD API (1s)</li>
+          <li>reset_password → generate temp (1s)</li>
+          <li>notify_user → Slack DM with link (1s)</li>
+        </ul>
+        <p style="margin-top:12px"><strong>Handoff rule:</strong> Confidence &lt;90% or identity verification fails → escalate to L1</p>
+        <p><strong>Audit:</strong> TOOL_CALL azure_ad.unlock_account | approver: AUTO (L3 policy) | id: AUD-9821</p>
+      </div>
+    </div>
+
+    <div class="cs-subhead">// 2. VPN Connectivity</div>
+    <div class="cs-two-col">
+      <div class="cs-col">
+        <div class="cs-col-label before">Before — 2–6 hours email exchanges</div>
+        <h4>Manual Process</h4>
+        <ul>
+          <li>User emails IT: "VPN keeps disconnecting"</li>
+          <li>L1 agent asks for VPN client version (email reply wait)</li>
+          <li>User responds hours later</li>
+          <li>L1 searches KB, finds nothing current</li>
+          <li>Escalates to L2 with minimal context</li>
+          <li>L2 re-diagnoses from scratch</li>
+        </ul>
+      </div>
+      <div class="cs-col">
+        <div class="cs-col-label after">After — ~15 min with HITL</div>
+        <h4>Agent-Assisted (L2 HITL)</h4>
+        <ul>
+          <li>Triage agent: vpn_connectivity (93% confidence)</li>
+          <li>diagnose → Client 6.1.2 matches known issue (3s)</li>
+          <li>enrich → CMDB lookup device info (2s)</li>
+          <li>propose → Push GP 6.1.4 via Jamf → awaiting L1 approval</li>
+          <li>draft_reply → Generated response for agent review</li>
+        </ul>
+        <p style="margin-top:12px"><strong>Handoff rule:</strong> Software deployment always requires human approval (L2 policy)</p>
+        <p><strong>Audit:</strong> TOOL_CALL jamf.deploy_package | awaiting: L1 approval</p>
+      </div>
+    </div>
+
+    <div class="cs-subhead">// 3. Software Install</div>
+    <div class="cs-two-col">
+      <div class="cs-col">
+        <div class="cs-col-label before">Before — 1–3 business days</div>
+        <h4>Manual Process</h4>
+        <ul>
+          <li>User submits portal request for Figma</li>
+          <li>L1 checks if software is approved (manual lookup)</li>
+          <li>L1 checks license availability (emails vendor admin)</li>
+          <li>Requests manager approval via email</li>
+          <li>Manager approves 1–2 days later</li>
+          <li>L1 submits deployment request to endpoint team</li>
+        </ul>
+      </div>
+      <div class="cs-col">
+        <div class="cs-col-label after">After — ~30 min with approval flow</div>
+        <h4>Agent-Assisted (L2 HITL)</h4>
+        <ul>
+          <li>Triage agent: software_install (95% confidence)</li>
+          <li>policy_check → Figma approved, Product entitled (1s)</li>
+          <li>license_check → 8/50 available (2s)</li>
+          <li>approval_check → Manager workflow triggered</li>
+          <li>deploy → Queue Intune deployment upon approval</li>
+        </ul>
+        <p style="margin-top:12px"><strong>Handoff rule:</strong> Manager approval required for all software installs (policy)</p>
+        <p><strong>Audit:</strong> TOOL_CALL intune.deploy_app | approval: pending mgr confirmation</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 6 -->
+  <div class="cs-section" id="s6">
+    <div class="cs-section-num">// 06</div>
+    <h2 class="cs-section-title">Agentic System <em>Design</em></h2>
+
+    <div class="cs-subhead">// 7-Agent Specification</div>
+    <div class="cs-table-wrap">
+      <table>
+        <thead><tr><th>Agent</th><th>Purpose</th><th>Inputs / Outputs</th><th>Tools</th><th>Guardrails</th><th>Failure Mode</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Triage</strong></td><td>Classify intent, priority, confidence</td><td>Raw ticket → structured classification</td><td>Claude API (structured output)</td><td>Confidence threshold; reject ambiguous</td><td>Low confidence → route to L1 queue</td></tr>
+          <tr><td><strong>Summarize / Dedup</strong></td><td>Merge duplicate tickets, summarize thread</td><td>Ticket + history → summary + dedup flag</td><td>Claude API, ITSM search</td><td>Similarity threshold for dedup</td><td>No match → treat as new ticket</td></tr>
+          <tr><td><strong>Retrieval</strong></td><td>Find relevant KB articles and past tickets</td><td>Classification → ranked KB results</td><td>Supabase pgvector, Confluence API</td><td>Relevance threshold; max 5 results</td><td>No relevant KB → flag for KB gap</td></tr>
+          <tr><td><strong>Resolver</strong></td><td>Execute resolution actions</td><td>Classification + KB → tool calls</td><td>Azure AD, Intune, Jamf, SCCM</td><td>Intent whitelist; per-tool risk level</td><td>Tool failure → retry once, then escalate</td></tr>
+          <tr><td><strong>Policy / Guardrail</strong></td><td>Enforce rules before any action</td><td>Proposed action → approve/deny</td><td>Policy engine, approval workflow</td><td>Hardcoded deny list; approval chain</td><td>Policy violation → block + log</td></tr>
+          <tr><td><strong>Escalation</strong></td><td>Route to humans with full context</td><td>Ticket + all agent outputs → escalation package</td><td>ITSM API, Slack notifications</td><td>Must include: summary, diagnosis, attempted actions</td><td>Escalation failure → alert on-call</td></tr>
+          <tr><td><strong>Feedback</strong></td><td>Collect outcomes, update confidence</td><td>Resolution outcome → training signal</td><td>Analytics DB, KB update API</td><td>Human review before KB changes</td><td>No feedback → default decay</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="cs-subhead">// Orchestration State Machine</div>
+    <div class="cs-diagram"><strong>INTAKE</strong> → <em>Triage Agent</em> → classification
+  ↓
+<strong>CLASSIFY</strong> → confidence ≥ threshold?
+  ├── YES → <em>Retrieval Agent</em> → KB results
+  └── NO  → <em>Escalation Agent</em> → L1 queue
+  ↓
+<strong>RETRIEVE</strong> → relevant KB found?
+  ├── YES → <em>Policy Agent</em> → check intent whitelist
+  └── NO  → <em>Escalation Agent</em> → L1 with "KB gap" flag
+  ↓
+<strong>POLICY CHECK</strong> → intent in auto-resolve whitelist?
+  ├── L3 (lights-out) → <em>Resolver Agent</em> → execute → <strong>RESOLVED</strong>
+  ├── L2 (HITL)       → <em>Resolver Agent</em> → propose → await approval → <strong>RESOLVED</strong>
+  ├── L1 (copilot)    → <em>Resolver Agent</em> → draft → send to agent → <strong>ASSISTED</strong>
+  └── DENY            → <em>Escalation Agent</em> → route to human
+  ↓
+<strong>OUTCOME</strong> → <em>Feedback Agent</em> → log result, update metrics</div>
+
+    <div class="cs-subhead">// Tool Contracts</div>
+    <div class="cs-table-wrap">
+      <table>
+        <thead><tr><th>Tool</th><th>Function</th><th>Auth Model</th><th>Risk Level</th></tr></thead>
+        <tbody>
+          <tr><td><strong>azure_ad.reset_password</strong></td><td>Reset user password to temp value</td><td>Service account + scope-limited token</td><td>Medium</td></tr>
+          <tr><td><strong>azure_ad.unlock_account</strong></td><td>Unlock a locked AD account</td><td>Service account + scope-limited token</td><td>Medium</td></tr>
+          <tr><td><strong>okta.verify_identity</strong></td><td>Push MFA verification to user</td><td>Okta API token (read + verify)</td><td>Low</td></tr>
+          <tr><td><strong>sccm.deploy_software</strong></td><td>Deploy approved software package</td><td>SCCM service account</td><td>High</td></tr>
+          <tr><td><strong>cmdb.query_asset</strong></td><td>Look up device/asset info</td><td>Read-only API key</td><td>Low</td></tr>
+          <tr><td><strong>cmdb.update_ticket</strong></td><td>Update ticket status and notes</td><td>ITSM service account</td><td>Low</td></tr>
+          <tr><td><strong>ad.modify_group</strong></td><td>Add/remove user from AD group</td><td>Privileged service account</td><td>High</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="cs-subhead">// Adapter Interfaces</div>
+    <div class="cs-table-wrap">
+      <table>
+        <thead><tr><th>Category</th><th>Systems</th><th>Adapter Pattern</th></tr></thead>
+        <tbody>
+          <tr><td><strong>ITSM</strong></td><td>ServiceNow, JSM, Zendesk</td><td>Unified ticket schema → platform-specific API calls</td></tr>
+          <tr><td><strong>Collaboration</strong></td><td>Slack, Teams, Email</td><td>Channel-agnostic intake → normalized message format</td></tr>
+          <tr><td><strong>Identity</strong></td><td>Okta, Azure AD</td><td>Identity operations abstracted behind common interface</td></tr>
+          <tr><td><strong>Knowledge</strong></td><td>Confluence, SharePoint</td><td>KB connector with chunking + embedding pipeline</td></tr>
+          <tr><td><strong>Endpoint</strong></td><td>SCCM, Intune, Jamf</td><td>Deployment commands mapped to platform-specific APIs</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SECTION 7 -->
+  <div class="cs-section" id="s7">
+    <div class="cs-section-num">// 07</div>
+    <h2 class="cs-section-title"><em>Architecture</em></h2>
+
+    <div class="cs-subhead">// Reference Architecture</div>
+    <div class="cs-diagram"><strong>INTAKE LAYER</strong>
+  Slack Bot | Teams Bot | Email Listener | Portal Webhook
+  └── n8n webhook nodes → unified ticket schema
+      ↓
+<strong>ORCHESTRATION LAYER</strong>
+  n8n workflow engine → agent routing + state management
+  ├── Triage Agent (Claude API structured output)
+  ├── Retrieval Agent (Supabase pgvector + Confluence)
+  ├── Resolver Agent (tool execution engine)
+  └── Escalation Agent (ITSM + notification routing)
+      ↓
+<strong>POLICY LAYER</strong>
+  Intent whitelist | Risk-level matrix | Approval workflows
+  └── n8n Wait node for HITL approval (Slack interactive message)
+      ↓
+<strong>DATA LAYER</strong>
+  Supabase (pgvector) | Confluence KB | CMDB | ITSM
+  └── Embedding pipeline: chunk → embed → index → retrieve
+      ↓
+<strong>OBSERVABILITY LAYER</strong>
+  Execution logs | Audit trail | Grafana dashboards
+  └── Every tool call logged: who, what, when, approved-by, outcome</div>
+
+    <div class="cs-subhead">// Architecture Options</div>
+    <div class="cs-table-wrap">
+      <table>
+        <thead><tr><th>Option</th><th>Agentic Level</th><th>Stack</th><th>Pros</th><th>Cons</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Low Agentic</strong></td><td>L0–L1 only</td><td>n8n + Claude API + Supabase (no tool execution)</td><td>Fast to deploy, low risk, easy GRC approval</td><td>Limited ROI, still requires human resolution</td></tr>
+          <tr><td><strong>Medium Agentic</strong></td><td>L0–L2</td><td>n8n + Claude API + Supabase + mock tool APIs + approval flow</td><td>Good ROI, HITL safety, demonstrates full pattern</td><td>Needs approval UX, more complex orchestration</td></tr>
+          <tr><td><strong>High Agentic</strong></td><td>L0–L3</td><td>Full stack + production tool APIs + policy engine + observability</td><td>Maximum ROI, full autonomy for safe intents</td><td>Needs production API access, full GRC review, higher risk</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="cs-subhead">// Three-Lens Framing</div>
+    <div class="cs-cards">
+      <div class="cs-card">
+        <div class="cs-card-title">Startup SaaS</div>
+        <div class="cs-card-text">Multi-tenant deployment, ITSM connectors as the moat, pricing at $0.50–$2.00/resolution. GTM wedge: "Connect your ServiceNow in 30 minutes, auto-resolve password resets by Day 2." Expand from there.</div>
+      </div>
+      <div class="cs-card">
+        <div class="cs-card-title">Consulting Blueprint</div>
+        <div class="cs-card-text">Repeatable engagement: 2-week discovery → 4-week MVP → 8-week scale. RACI template, phased rollout plan, change management playbook. Deliverables: working system + runbook + training.</div>
+      </div>
+      <div class="cs-card">
+        <div class="cs-card-title">Internal Enterprise</div>
+        <div class="cs-card-text">Data residency compliance, RBAC/ABAC for tool access, GRC review readiness from Day 1. Single-tenant deployment, integrates with existing ITSM and identity infrastructure.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 8 -->
+  <div class="cs-section" id="s8">
+    <div class="cs-section-num">// 08</div>
+    <h2 class="cs-section-title">Build vs. Buy <em>Matrix</em></h2>
+
+    <div class="cs-table-wrap">
+      <table>
+        <thead><tr><th>Solution</th><th>Type</th><th>Strengths</th><th>Gaps for This Use Case</th></tr></thead>
+        <tbody>
+          <tr><td><strong>ServiceNow Now Assist</strong></td><td>Native ITSM AI</td><td>Deep ServiceNow integration, enterprise-grade</td><td>Locked to ServiceNow ecosystem, limited customization of agent logic</td></tr>
+          <tr><td><strong>Atlassian Rovo (JSM)</strong></td><td>Native ITSM AI</td><td>Good for Jira-native orgs, virtual agent capability</td><td>Less mature for complex resolution, Atlassian-only</td></tr>
+          <tr><td><strong>Zendesk AI</strong></td><td>Native ITSM AI</td><td>Strong for customer-facing support</td><td>Weaker for internal IT ops, limited tool execution</td></tr>
+          <tr><td><strong>Microsoft Copilot for Service</strong></td><td>Platform AI</td><td>M365 integration, enterprise trust</td><td>Early-stage, limited agentic capabilities beyond chat</td></tr>
+          <tr><td><strong>Google Vertex AI Agents</strong></td><td>Platform AI</td><td>Strong ML infrastructure, good for custom agents</td><td>Requires significant custom build, no ITSM-specific features</td></tr>
+          <tr><td><strong>LangGraph / CrewAI / AutoGen</strong></td><td>Agent Frameworks</td><td>Maximum flexibility, open-source, multi-agent native</td><td>No ITSM integration, requires full custom build, infra overhead</td></tr>
+          <tr><td><strong>Amazon Bedrock Agents</strong></td><td>Platform AI</td><td>AWS integration, managed infrastructure</td><td>AWS-centric, limited orchestration compared to dedicated frameworks</td></tr>
+          <tr><td><strong>LangSmith / Arize</strong></td><td>Eval & Observability</td><td>Purpose-built for LLM evaluation and monitoring</td><td>Complementary tool, not a replacement for agent logic</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="cs-subhead">// Recommended Choices by Lens</div>
+    <div class="cs-table-wrap">
+      <table>
+        <thead><tr><th>Lens</th><th>Build</th><th>Buy</th><th>Rationale</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Startup SaaS</strong></td><td>Agent orchestration, policy engine, ITSM adapters</td><td>Claude API, Supabase, n8n</td><td>Differentiation is in the agent logic and adapters, not the LLM or infra</td></tr>
+          <tr><td><strong>Consulting</strong></td><td>Client-specific adapters, workflow customization</td><td>n8n, Claude API, client's existing ITSM</td><td>Minimize custom infra; maximize reusable patterns</td></tr>
+          <tr><td><strong>Enterprise</strong></td><td>Custom policy engine, RBAC/ABAC integration</td><td>ServiceNow Now Assist + custom agent layer</td><td>Leverage existing ITSM investment; extend with custom agentic capabilities</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SECTION 9 -->
+  <div class="cs-section" id="s9">
+    <div class="cs-section-num">// 09</div>
+    <h2 class="cs-section-title">Security, Privacy & <em>Compliance</em></h2>
+
+    <div class="cs-subhead">// Threat Model</div>
+    <div class="cs-table-wrap">
+      <table>
+        <thead><tr><th>Threat</th><th>Risk</th><th>Controls</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Prompt Injection</strong></td><td>High — attacker crafts ticket to manipulate agent behavior</td><td>Input sanitization, structured output parsing (not free-text), intent classification before action, adversarial test suite</td></tr>
+          <tr><td><strong>Data Exfiltration</strong></td><td>Medium — LLM leaks PII from tickets or KB</td><td>PII detection + masking before LLM processing, no PII in prompts or logs, data retention policy</td></tr>
+          <tr><td><strong>Unsafe Tool Execution</strong></td><td>High — agent executes destructive action</td><td>Intent whitelist, per-tool risk levels, HITL approval for high-risk tools, rollback support</td></tr>
+          <tr><td><strong>Privilege Escalation</strong></td><td>High — agent gains access beyond scope</td><td>Least-privilege service accounts, scope-limited tokens, no credential storage in agent code</td></tr>
+          <tr><td><strong>Hallucinated Resolution</strong></td><td>Medium — agent invents a fix not grounded in KB</td><td>RAG with citations (must cite source), confidence thresholds, human review for novel resolutions</td></tr>
+          <tr><td><strong>Denial of Service</strong></td><td>Low — flood system with tickets to overwhelm agent</td><td>Rate limiting, queue depth monitoring, circuit breaker on agent processing</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="cs-subhead">// Governance Checklist</div>
+    <div class="cs-table-wrap">
+      <table>
+        <thead><tr><th>SecOps Question</th><th>Required Evidence</th></tr></thead>
+        <tbody>
+          <tr><td>What data does the AI access?</td><td>Data flow diagram, data classification, PII inventory</td></tr>
+          <tr><td>What actions can the AI take?</td><td>Tool contract table with risk levels, intent whitelist</td></tr>
+          <tr><td>How are AI decisions audited?</td><td>Audit trail schema, Grafana dashboard, log retention policy</td></tr>
+          <tr><td>What happens when the AI fails?</td><td>Failure mode table, escalation procedures, rollback documentation</td></tr>
+          <tr><td>How is the AI tested?</td><td>Evaluation harness, adversarial test results, regression suite</td></tr>
+          <tr><td>Who is responsible?</td><td>RACI matrix, incident response plan, escalation contacts</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="cs-subhead">// What We Will NOT Automate</div>
+    <div class="cs-table-wrap">
+      <table>
+        <thead><tr><th>Action</th><th>Rationale</th></tr></thead>
+        <tbody>
+          <tr><td>Security incident response</td><td>Hardcoded escalation — security incidents require human judgment and legal awareness</td></tr>
+          <tr><td>Active Directory group modifications</td><td>Privilege escalation risk too high for autonomous action; always requires human approval</td></tr>
+          <tr><td>Production system changes</td><td>Out of scope — this system manages IT support, not infrastructure</td></tr>
+          <tr><td>Employee termination/offboarding</td><td>HR and legal implications require human oversight at every step</td></tr>
+          <tr><td>Data deletion requests</td><td>GDPR/CCPA compliance requires verified human approval chain</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SECTION 10 -->
+  <div class="cs-section" id="s10">
+    <div class="cs-section-num">// 10</div>
+    <h2 class="cs-section-title">Evaluation & <em>Metrics</em></h2>
+
+    <div class="cs-subhead">// Offline Metrics</div>
+    <div class="cs-table-wrap">
+      <table>
+        <thead><tr><th>Metric</th><th>What It Measures</th><th>MVP Threshold</th><th>Lights-Out Threshold</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Routing Accuracy</strong></td><td>% tickets correctly classified by intent + priority</td><td>≥85%</td><td>≥95%</td></tr>
+          <tr><td><strong>Suggestion Precision</strong></td><td>% agent-suggested resolutions that are correct</td><td>≥80%</td><td>≥92%</td></tr>
+          <tr><td><strong>Hallucination Rate</strong></td><td>% resolutions not grounded in KB or past tickets</td><td>≤10%</td><td>≤2%</td></tr>
+          <tr><td><strong>Citation Correctness</strong></td><td>% citations that match the actual source content</td><td>≥90%</td><td>≥98%</td></tr>
+          <tr><td><strong>Tool-Call Correctness</strong></td><td>% tool invocations with correct parameters</td><td>≥95%</td><td>≥99%</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="cs-subhead">// Online Metrics</div>
+    <div class="cs-table-wrap">
+      <table>
+        <thead><tr><th>Metric</th><th>Current Baseline</th><th>6-Month Target</th><th>Owner</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Deflection Rate</strong></td><td>~5%</td><td>30%+</td><td>Product</td></tr>
+          <tr><td><strong>MTTR</strong></td><td>4.2 hours</td><td>1.8 hours</td><td>Ops</td></tr>
+          <tr><td><strong>Time to First Response</strong></td><td>25 min</td><td>&lt;2 min</td><td>Product</td></tr>
+          <tr><td><strong>Reopen Rate</strong></td><td>12%</td><td>&lt;8%</td><td>Quality</td></tr>
+          <tr><td><strong>SLA Breach Rate</strong></td><td>8%</td><td>&lt;3%</td><td>Ops</td></tr>
+          <tr><td><strong>CSAT</strong></td><td>3.8/5</td><td>4.2+/5</td><td>Product</td></tr>
+          <tr><td><strong>Agent Productivity</strong></td><td>18 tickets/day</td><td>28 tickets/day</td><td>Ops</td></tr>
+          <tr><td><strong>Escalation Rate</strong></td><td>35%</td><td>&lt;20%</td><td>Product</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="cs-subhead">// Evaluation Harness Plan</div>
+    <ul class="cs-bullets">
+      <li><strong>Golden Set:</strong> 200 manually labeled tickets across all intent categories — used for regression testing every release</li>
+      <li><strong>Adversarial Tests:</strong> 50 prompt injection attempts, ambiguous tickets, multi-intent tickets, PII-heavy tickets — must pass 100%</li>
+      <li><strong>Regression Suite:</strong> Automated nightly runs against golden set — any accuracy drop &gt;2% blocks deployment</li>
+      <li><strong>A/B Testing:</strong> Shadow mode for new capabilities — AI processes ticket in parallel, human resolves, compare outcomes before enabling</li>
+    </ul>
+  </div>
+
+  <!-- SECTION 11 -->
+  <div class="cs-section" id="s11">
+    <div class="cs-section-num">// 11</div>
+    <h2 class="cs-section-title">Roadmap & Execution <em>Plan</em></h2>
+
+    <div class="cs-subhead">// MVP Wedge Rationale</div>
+    <p class="cs-text">
+      <strong>Password reset / account unlock</strong> is the ideal MVP wedge: highest volume category (25–35% of tickets), lowest risk (identity verification + single API call), fastest time-to-value (lights-out resolution in under 60 seconds), and most measurable ROI (direct cost comparison to manual process). If we can't get this right, we can't get anything right.
+    </p>
+
+    <div class="cs-subhead">// 6-Week MVP Roadmap</div>
+    <div class="cs-table-wrap">
+      <table>
+        <thead><tr><th>Week</th><th>Epic</th><th>Milestones</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Week 1</strong></td><td>Foundation</td><td>n8n workspace + Supabase instance + Claude API access. Slack bot deployed to test channel. KB audit started — identify top 50 articles for embedding.</td></tr>
+          <tr><td><strong>Week 2</strong></td><td>Triage + Retrieval</td><td>Triage agent classifying tickets with &gt;85% accuracy on golden set. KB embedded and retrievable via pgvector. Retrieval agent returning relevant articles with scores.</td></tr>
+          <tr><td><strong>Week 3</strong></td><td>Resolution (Copilot)</td><td>Resolver agent drafting responses for password reset intents. L1 copilot mode: agent suggests, human sends. GRC review checkpoint — present threat model and audit trail.</td></tr>
+          <tr><td><strong>Week 4</strong></td><td>Resolution (HITL)</td><td>Mock Azure AD API for account unlock. HITL approval flow via Slack. End-to-end: ticket → triage → retrieve → propose → approve → resolve. Dashboard with key metrics.</td></tr>
+          <tr><td><strong>Week 5</strong></td><td>Hardening</td><td>Adversarial testing (prompt injection, edge cases). PII masking pipeline. Audit trail completeness verification. Load testing at 2x expected volume.</td></tr>
+          <tr><td><strong>Week 6</strong></td><td>Pilot Launch</td><td>Deploy to pilot group (50 users, password reset only). Monitor all metrics. Daily standup on anomalies. Collect L1 agent feedback. Go/no-go for expansion.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="cs-subhead">// 6-Month Scale Roadmap</div>
+    <div class="cs-table-wrap">
+      <table>
+        <thead><tr><th>Month</th><th>Focus</th><th>Scope</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Month 1–2</strong></td><td>MVP (Password Reset)</td><td>L2 HITL for password reset/account unlock. 50-user pilot → full org rollout.</td></tr>
+          <tr><td><strong>Month 3</strong></td><td>Expand Intents</td><td>Add VPN connectivity + software install intents. L1 copilot mode for new intents.</td></tr>
+          <tr><td><strong>Month 4</strong></td><td>Lights-Out</td><td>Promote password reset to L3 (lights-out). VPN moves to L2 HITL. Production API integration.</td></tr>
+          <tr><td><strong>Month 5</strong></td><td>Scale & Optimize</td><td>Add email/collaboration intents. KB auto-refresh pipeline. Agent performance tuning.</td></tr>
+          <tr><td><strong>Month 6</strong></td><td>Measure & Report</td><td>Full ROI analysis. Executive presentation. Plan for Phase 2 (hardware, service requests, proactive monitoring).</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="cs-subhead">// Change Management Plan</div>
+    <div class="cs-table-wrap">
+      <table>
+        <thead><tr><th>Audience</th><th>Message</th><th>Channel</th><th>Timing</th></tr></thead>
+        <tbody>
+          <tr><td><strong>L1 Agents</strong></td><td>"AI handles the repetitive stuff so you can focus on complex, rewarding work"</td><td>Team meeting + hands-on demo + feedback sessions</td><td>Week 2 (before pilot)</td></tr>
+          <tr><td><strong>L2/L3 SMEs</strong></td><td>"Better-triaged escalations with full context — less re-diagnosis, more resolution"</td><td>1:1 briefings + escalation quality review</td><td>Week 3</td></tr>
+          <tr><td><strong>IT Leadership</strong></td><td>"Measurable ROI in Week 4, full audit trail, policy-gated autonomy"</td><td>Executive brief + dashboard walkthrough</td><td>Week 4</td></tr>
+          <tr><td><strong>End Users</strong></td><td>"Get your IT issues resolved faster — try the new Slack bot for password resets"</td><td>Slack announcement + internal blog post</td><td>Week 6 (pilot launch)</td></tr>
+          <tr><td><strong>SecOps / GRC</strong></td><td>"Every AI action audited, threat model reviewed, hardcoded deny list for security incidents"</td><td>GRC review meeting + documentation package</td><td>Week 3 (pre-pilot)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="cs-subhead">// ROI Model with Sensitivity</div>
+    <div class="cs-table-wrap">
+      <table>
+        <thead><tr><th>Scenario</th><th>Deflection Rate</th><th>Cost Reduction</th><th>Annual Savings</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Conservative</strong></td><td>25%</td><td>$22 → $18</td><td><strong>$576,000</strong></td></tr>
+          <tr><td><strong>Base</strong></td><td>32%</td><td>$22 → $15</td><td><strong>$744,000</strong></td></tr>
+          <tr><td><strong>Optimistic</strong></td><td>40%</td><td>$22 → $12</td><td><strong>$948,000</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="cs-text"><em>Assumptions: 12,000 tickets/month, current avg cost $22/ticket, savings calculated as (current cost - new cost) × volume × 12 months. Does not include MTTR improvement value or CSAT uplift.</em></p>
+  </div>
+
+  <!-- SECTION 12 -->
+  <div class="cs-section" id="s12">
+    <div class="cs-section-num">// 12</div>
+    <h2 class="cs-section-title">Portfolio <em>Packaging</em></h2>
+
+    <div class="cs-subhead">// Case Study TL;DR</div>
+    <ul class="cs-bullets">
+      <li>Designed an <strong>agentic IT support system</strong> that classifies, retrieves, and resolves tickets autonomously</li>
+      <li>Built a <strong>4-level trust ramp</strong> (Copilot → HITL → Lights-Out) with policy-gated autonomy</li>
+      <li>Architected a <strong>7-agent orchestration system</strong> with specialized agents for triage, retrieval, resolution, policy, and escalation</li>
+      <li>Defined <strong>adapter interfaces</strong> for ServiceNow, JSM, Zendesk, Okta, Azure AD, Intune, and Jamf</li>
+      <li>Projected <strong>$576K–$948K annual savings</strong> with 25–40% ticket deflection rate</li>
+      <li>Built an <strong>interactive demo</strong> showing real-time agent processing of 4 ticket types</li>
+      <li>Created <strong>comprehensive evaluation harness</strong> with offline metrics, online metrics, and adversarial testing</li>
+      <li>Designed <strong>6-week MVP roadmap</strong> starting with password reset (highest volume, lowest risk)</li>
+    </ul>
+
+    <div class="cs-subhead">// Resume Bullets</div>
+    <ul class="cs-bullets">
+      <li>Designed an <strong>agentic IT support triage system</strong> targeting 30% ticket deflection and 57% MTTR reduction across 12K tickets/month, projecting <strong>$580K–$950K annual savings</strong> (assumptions: $22 current cost, 25–40% deflection rates, 12-month horizon)</li>
+      <li>Architected a <strong>7-agent multi-agent system</strong> with policy-gated autonomy (4-level trust ramp), RAG-grounded resolution with citations, and adapter interfaces for 5 enterprise system categories (ITSM, Identity, Endpoint, Knowledge, Collaboration)</li>
+      <li>Built an <strong>interactive portfolio demo</strong> simulating real-time agent processing of 4 IT support ticket types, showcasing intent classification, knowledge retrieval, tool execution, and audit trail generation</li>
+    </ul>
+
+    <div class="cs-subhead">// Interview Talking Points</div>
+    <ul class="cs-bullets">
+      <li><strong>Trust Ramp Tradeoff:</strong> "The hardest PM decision isn't what the AI can do — it's what you allow it to do. We designed a 4-level trust ramp because enterprise IT won't accept big-bang autonomy. Each level has to earn its way to the next through measured performance."</li>
+      <li><strong>Security-First Design:</strong> "I made security a design principle, not an afterthought. Security incidents are hardcoded to escalate — no confidence score overrides that. Every tool call is audited. PII is masked before it reaches the LLM. This is how you get GRC approval."</li>
+      <li><strong>MVP Wedge Selection:</strong> "Password reset was the obvious wedge: highest volume (25–35%), lowest risk (single API call), fastest time-to-value (47 seconds vs. 45 minutes). If we can't nail this, we can't nail anything. Start narrow, prove value, then expand."</li>
+      <li><strong>Build vs. Buy Nuance:</strong> "The answer depends on your lens. A startup builds the orchestration and adapters (that's the moat). A consulting firm maximizes reusable patterns on client infra. An enterprise extends their existing ITSM vendor's AI with custom agent logic for gaps."</li>
+      <li><strong>Measuring AI That Acts:</strong> "Traditional chatbot metrics (CSAT, containment) don't capture agentic value. You need tool-call correctness, hallucination rate, and citation accuracy alongside deflection rate and MTTR. We designed an evaluation harness with golden sets, adversarial tests, and shadow-mode A/B testing."</li>
+    </ul>
+
+    <div class="cs-subhead">// What I'd Do Next</div>
+    <ul class="cs-bullets">
+      <li><strong>Production API Integration:</strong> Replace mock tool APIs with real Azure AD, Intune, and Jamf integrations in a sandboxed environment</li>
+      <li><strong>Proactive Monitoring:</strong> Shift from reactive tickets to proactive detection — agent monitors system health and creates tickets before users report issues</li>
+      <li><strong>Multi-Language Support:</strong> Extend triage and resolution to support tickets in multiple languages for global enterprises</li>
+      <li><strong>Agent Performance Benchmarking:</strong> Build a public benchmark dataset for IT support agent evaluation — contribute to the community</li>
+    </ul>
+  </div>
+
+  <div class="page-bottom">
+    <a href="../projects/it-triage-agent.html" class="page-bottom-link">← Back to Interactive Demo</a>
+    <a href="../index.html#projects" class="page-bottom-link">← Back to Portfolio</a>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-copy">© 2026 Dinesh Pant · All rights reserved</div>
+  <div class="footer-edu">MBA · <span>Kelley School of Business</span> · May 2026</div>
+</footer>
+
+</body>
+</html>
