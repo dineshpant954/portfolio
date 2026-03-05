@@ -1,0 +1,7 @@
+services:
+  cloudflared:
+    environment:
+      - CLOUDFLARED_TUNNEL_TOKEN=${CLOUDFLARED_TUNNEL_TOKEN}
+    volumes:
+      - ./cloudflared:/etc/cloudflared:ro
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARED_TUNNEL_TOKEN}
