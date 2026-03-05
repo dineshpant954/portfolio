@@ -3,526 +3,451 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IT Support Ticket Triage & Resolution — Dinesh Pant</title>
+<title>IT Support Ticket Triage & Resolution Agent - Dinesh Pant</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Syne:wght@400;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --black: #080a0f; --surface: #0d1117; --surface2: #131920;
-    --border: rgba(255,255,255,0.07); --accent: #00e5a0;
-    --text: #e8edf5; --muted: #6b7a90; --dim: #3a4455;
-    --critical: #ff4d6a; --high: #ff9f43; --medium: #ffd93d; --low: #00e5a0;
-  }
-  html { scroll-behavior: smooth; }
-  body { font-family: 'Syne', sans-serif; background: var(--black); color: var(--text); overflow-x: hidden; }
-  body::before { content:''; position:fixed; inset:0; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E"); opacity:.4; pointer-events:none; z-index:9999; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --black:#080a0f;--surface:#0d1117;--surface2:#131920;
+  --border:rgba(255,255,255,0.07);--accent:#00e5a0;
+  --text:#e8edf5;--muted:#6b7a90;--dim:#3a4455;
+  --green:#00e5a0;--amber:#ffd93d;--red:#ff4d6a;
+}
+html{scroll-behavior:smooth;}
+body{font-family:'Syne',sans-serif;background:var(--black);color:var(--text);overflow-x:hidden;line-height:1.6;}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");opacity:.4;pointer-events:none;z-index:9999;}
 
-  .back-link { display:inline-flex; align-items:center; gap:8px; font-family:'DM Mono',monospace; font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); text-decoration:none; transition:color 0.2s; padding:24px 60px; }
-  .back-link:hover { color:var(--accent); }
+.wrap{max-width:920px;margin:0 auto;padding:0 60px;}
 
-  .page-header { padding:40px 60px 80px; position:relative; overflow:hidden; }
-  .page-header::before { content:''; position:absolute; top:-200px; right:-100px; width:600px; height:600px; border-radius:50%; background:radial-gradient(circle,rgba(0,229,160,0.06) 0%,transparent 70%); pointer-events:none; }
-  .page-header .section-label { font-family:'DM Mono',monospace; font-size:10px; font-weight:500; letter-spacing:0.2em; text-transform:uppercase; color:var(--accent); margin-bottom:16px; }
-  .page-title { font-family:'DM Serif Display',serif; font-size:clamp(36px,5vw,56px); line-height:1.08; letter-spacing:-0.02em; color:var(--text); margin-bottom:12px; }
-  .page-title em { font-style:italic; color:var(--accent); }
-  .page-subtitle { font-family:'DM Mono',monospace; font-size:12px; letter-spacing:0.15em; text-transform:uppercase; color:var(--muted); margin-bottom:40px; }
-  .problem-statement { max-width:780px; font-size:17px; line-height:1.8; color:var(--muted); }
-  .problem-statement strong { color:var(--text); font-weight:700; }
+/* Back link */
+.back{display:inline-flex;align-items:center;gap:8px;font-family:'DM Mono',monospace;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color 0.2s;padding:24px 0;}
+.back:hover{color:var(--accent);}
 
-  section { padding:80px 60px; }
+/* Hero */
+.hero{padding:40px 0 80px;border-bottom:1px solid var(--border);}
+.hero-label{font-family:'DM Mono',monospace;font-size:10px;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent);margin-bottom:16px;}
+.hero h1{font-family:'DM Serif Display',serif;font-size:clamp(32px,4.5vw,48px);line-height:1.1;letter-spacing:-0.02em;color:var(--text);margin-bottom:12px;}
+.hero h1 em{font-style:italic;color:var(--accent);}
+.hero-sub{font-family:'DM Mono',monospace;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:28px;}
+.badges{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:32px;}
+.badge{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);border:1px solid rgba(0,229,160,0.3);padding:5px 14px;}
+.problem{font-size:16px;line-height:1.85;color:var(--muted);max-width:760px;}
+.problem strong{color:var(--text);font-weight:700;}
 
-  .principles-row { display:grid; grid-template-columns:repeat(4,1fr); gap:2px; margin-top:48px; }
-  .principle-card { background:var(--surface); padding:28px 24px; border-top:2px solid var(--accent); }
-  .principle-icon { font-family:'DM Mono',monospace; font-size:18px; color:var(--accent); margin-bottom:12px; }
-  .principle-title { font-size:15px; font-weight:700; color:var(--text); margin-bottom:8px; }
-  .principle-desc { font-family:'DM Mono',monospace; font-size:11px; color:var(--muted); line-height:1.6; }
+/* Principle cards */
+.principles{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;margin-top:40px;}
+.principle{background:var(--surface);padding:24px 20px;border-top:2px solid var(--accent);}
+.principle-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;}
+.principle-desc{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);line-height:1.6;}
 
-  /* Demo Section */
-  #demo { background:var(--surface); }
-  .demo-label { font-family:'DM Mono',monospace; font-size:10px; font-weight:500; letter-spacing:0.2em; text-transform:uppercase; color:var(--accent); margin-bottom:16px; }
-  .demo-title { font-family:'DM Serif Display',serif; font-size:clamp(28px,4vw,42px); line-height:1.1; color:var(--text); margin-bottom:12px; }
-  .demo-title em { font-style:italic; color:var(--accent); }
-  .demo-subtitle { font-family:'DM Mono',monospace; font-size:11px; color:var(--muted); letter-spacing:0.1em; margin-bottom:48px; }
+/* Section headers */
+.section-num{font-family:'DM Mono',monospace;font-size:10px;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent);margin-bottom:12px;}
+.section-title{font-family:'DM Serif Display',serif;font-size:clamp(26px,3.5vw,38px);line-height:1.15;color:var(--text);margin-bottom:12px;}
+.section-title em{font-style:italic;color:var(--accent);}
+.section-sub{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:0.1em;margin-bottom:40px;}
 
-  .demo-layout { display:grid; grid-template-columns:360px 1fr; gap:2px; min-height:600px; }
+/* Demo section */
+.demo-section{padding:80px 0;border-bottom:1px solid var(--border);}
+.demo-layout{display:grid;grid-template-columns:320px 1fr;gap:2px;min-height:520px;}
 
-  /* Ticket Queue */
-  .ticket-queue-header { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:var(--accent); padding:16px 20px; background:var(--surface2); border-bottom:1px solid var(--border); }
-  .ticket-queue { background:var(--surface2); }
-  .ticket-card { padding:20px; border-bottom:1px solid var(--border); cursor:pointer; transition:all 0.2s; position:relative; }
-  .ticket-card:hover { background:rgba(0,229,160,0.03); }
-  .ticket-card.active { background:rgba(0,229,160,0.06); border-left:3px solid var(--accent); }
-  .ticket-card.active .ticket-id { color:var(--accent); }
-  .ticket-id { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:0.1em; color:var(--dim); margin-bottom:6px; }
-  .ticket-subject { font-size:14px; font-weight:700; color:var(--text); margin-bottom:8px; line-height:1.4; }
-  .ticket-meta { display:flex; flex-wrap:wrap; gap:12px; align-items:center; }
-  .ticket-meta-item { font-family:'DM Mono',monospace; font-size:10px; color:var(--muted); display:flex; align-items:center; gap:4px; }
-  .ticket-channel { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.1em; text-transform:uppercase; color:var(--black); background:var(--dim); padding:2px 8px; border-radius:2px; }
-  .ticket-channel.slack { background:#4A154B; color:#fff; }
-  .ticket-channel.email { background:#2563eb; color:#fff; }
-  .ticket-channel.portal { background:#6b7a90; color:#fff; }
+/* Ticket queue */
+.queue-header{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent);padding:14px 20px;background:var(--surface2);border-bottom:1px solid var(--border);}
+.queue{background:var(--surface2);}
+.ticket{padding:18px 20px;border-bottom:1px solid var(--border);cursor:pointer;transition:all 0.2s;position:relative;}
+.ticket:hover{background:rgba(0,229,160,0.03);}
+.ticket.active{background:rgba(0,229,160,0.06);border-left:3px solid var(--accent);}
+.ticket-route{position:absolute;top:18px;right:16px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:3px 8px;border-radius:2px;}
+.ticket-route.l3{background:rgba(0,229,160,0.12);color:var(--green);}
+.ticket-route.l2{background:rgba(255,217,61,0.12);color:var(--amber);}
+.ticket-route.esc{background:rgba(255,77,106,0.12);color:var(--red);}
+.ticket-id{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.1em;color:var(--dim);margin-bottom:5px;}
+.ticket-msg{font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px;line-height:1.4;padding-right:60px;}
+.ticket-from{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);}
 
-  /* Agent Panel */
-  .agent-panel { background:var(--black); position:relative; overflow:hidden; }
-  .agent-panel-header { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:var(--accent); padding:16px 24px; background:rgba(0,229,160,0.04); border-bottom:1px solid var(--border); display:flex; align-items:center; gap:8px; }
-  .agent-panel-header .pulse { width:8px; height:8px; border-radius:50%; background:var(--accent); animation:pulse 2s infinite; }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-  .agent-content { padding:24px; overflow-y:auto; max-height:calc(100vh - 200px); }
-  .agent-placeholder { display:flex; flex-direction:column; align-items:center; justify-content:center; height:400px; text-align:center; }
-  .agent-placeholder-icon { font-size:48px; color:var(--dim); margin-bottom:16px; opacity:0.5; }
-  .agent-placeholder-text { font-family:'DM Mono',monospace; font-size:12px; color:var(--dim); letter-spacing:0.1em; }
+/* Agent panel */
+.panel{background:var(--black);position:relative;}
+.panel-header{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent);padding:14px 24px;background:rgba(0,229,160,0.04);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+.panel-header .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.panel-body{padding:24px;overflow-y:auto;max-height:600px;}
+.placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;height:300px;text-align:center;color:var(--dim);font-family:'DM Mono',monospace;font-size:12px;}
 
-  /* Agent Steps */
-  .agent-step { opacity:0; transform:translateY(16px); transition:opacity 0.5s ease, transform 0.5s ease; margin-bottom:20px; }
-  .agent-step.visible { opacity:1; transform:translateY(0); }
-  .step-header { display:flex; align-items:center; gap:10px; margin-bottom:12px; }
-  .step-badge { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.15em; text-transform:uppercase; padding:4px 10px; border:1px solid var(--accent); color:var(--accent); }
-  .step-title { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--text); }
+/* Agent steps */
+.step{opacity:0;transform:translateY(14px);transition:opacity 0.4s ease,transform 0.4s ease;margin-bottom:18px;}
+.step.show{opacity:1;transform:translateY(0);}
+.step-head{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.step-badge{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;padding:4px 10px;border:1px solid var(--accent);color:var(--accent);}
+.step-name{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text);}
 
-  .classification-grid { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:8px; }
-  .pill { font-family:'DM Mono',monospace; font-size:10px; padding:5px 12px; border-radius:2px; }
-  .pill-intent { background:rgba(0,229,160,0.15); color:var(--accent); border:1px solid rgba(0,229,160,0.3); }
-  .pill-confidence { background:rgba(0,229,160,0.08); color:var(--accent); }
-  .pill-priority.p1 { background:rgba(255,77,106,0.15); color:var(--critical); border:1px solid rgba(255,77,106,0.3); }
-  .pill-priority.p2 { background:rgba(255,159,67,0.15); color:var(--high); border:1px solid rgba(255,159,67,0.3); }
-  .pill-priority.p3 { background:rgba(255,217,61,0.15); color:var(--medium); border:1px solid rgba(255,217,61,0.3); }
-  .pill-priority.p4 { background:rgba(0,229,160,0.1); color:var(--low); border:1px solid rgba(0,229,160,0.2); }
-  .pill-category { background:rgba(255,255,255,0.05); color:var(--muted); border:1px solid var(--border); }
+.pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px;}
+.pill{font-family:'DM Mono',monospace;font-size:10px;padding:4px 10px;border-radius:2px;}
+.pill-intent{background:rgba(0,229,160,0.12);color:var(--accent);border:1px solid rgba(0,229,160,0.25);}
+.pill-conf{background:rgba(0,229,160,0.06);color:var(--accent);}
+.pill-p1{background:rgba(255,77,106,0.12);color:var(--red);border:1px solid rgba(255,77,106,0.25);}
+.pill-p2{background:rgba(255,159,67,0.12);color:#ff9f43;border:1px solid rgba(255,159,67,0.25);}
+.pill-p3{background:rgba(255,217,61,0.12);color:var(--amber);border:1px solid rgba(255,217,61,0.25);}
+.pill-cat{background:rgba(255,255,255,0.04);color:var(--muted);border:1px solid var(--border);}
+.pill-sec{background:rgba(255,77,106,0.15);color:var(--red);border:1px solid rgba(255,77,106,0.3);}
 
-  .kb-article { background:var(--surface); border:1px solid var(--border); padding:12px 16px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; }
-  .kb-article-title { font-size:13px; color:var(--text); }
-  .kb-article-id { font-family:'DM Mono',monospace; font-size:10px; color:var(--muted); margin-top:2px; }
-  .kb-score { font-family:'DM Mono',monospace; font-size:11px; color:var(--accent); white-space:nowrap; }
+.kb-item{background:var(--surface);border:1px solid var(--border);padding:10px 14px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;}
+.kb-title{font-size:12px;color:var(--text);}
+.kb-id{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:2px;}
+.kb-score{font-family:'DM Mono',monospace;font-size:10px;color:var(--accent);}
 
-  .resolution-step { display:flex; align-items:flex-start; gap:12px; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.03); }
-  .resolution-step:last-child { border-bottom:none; }
-  .res-status { font-size:16px; flex-shrink:0; width:24px; text-align:center; margin-top:1px; }
-  .res-content { flex:1; }
-  .res-action { font-family:'DM Mono',monospace; font-size:11px; color:var(--text); letter-spacing:0.05em; }
-  .res-detail { font-size:12px; color:var(--muted); margin-top:2px; }
-  .res-time { font-family:'DM Mono',monospace; font-size:10px; color:var(--dim); margin-top:2px; }
+.res-step{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.03);}
+.res-step:last-child{border-bottom:none;}
+.res-icon{font-size:14px;flex-shrink:0;width:20px;text-align:center;margin-top:1px;}
+.res-text{flex:1;}
+.res-action{font-family:'DM Mono',monospace;font-size:11px;color:var(--text);}
+.res-detail{font-size:11px;color:var(--muted);margin-top:2px;}
 
-  .outcome-card { background:linear-gradient(135deg, rgba(0,229,160,0.08) 0%, rgba(0,229,160,0.02) 100%); border:1px solid rgba(0,229,160,0.2); padding:20px; margin-top:8px; }
-  .outcome-card.escalated { background:linear-gradient(135deg, rgba(255,77,106,0.08) 0%, rgba(255,77,106,0.02) 100%); border-color:rgba(255,77,106,0.3); }
-  .outcome-card.hitl { background:linear-gradient(135deg, rgba(255,217,61,0.08) 0%, rgba(255,217,61,0.02) 100%); border-color:rgba(255,217,61,0.3); }
-  .outcome-header { display:flex; align-items:center; gap:12px; margin-bottom:12px; }
-  .outcome-mode { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; font-weight:700; }
-  .outcome-card .outcome-mode { color:var(--accent); }
-  .outcome-card.escalated .outcome-mode { color:var(--critical); }
-  .outcome-card.hitl .outcome-mode { color:var(--medium); }
-  .outcome-time { font-family:'DM Mono',monospace; font-size:11px; color:var(--muted); }
-  .outcome-audit { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--dim); line-height:1.6; background:rgba(0,0,0,0.3); padding:10px 14px; margin-top:12px; word-break:break-all; }
+.outcome{padding:16px;margin-top:8px;border:1px solid rgba(0,229,160,0.2);background:linear-gradient(135deg,rgba(0,229,160,0.06) 0%,rgba(0,229,160,0.01) 100%);}
+.outcome.hitl{border-color:rgba(255,217,61,0.25);background:linear-gradient(135deg,rgba(255,217,61,0.06) 0%,rgba(255,217,61,0.01) 100%);}
+.outcome.esc{border-color:rgba(255,77,106,0.25);background:linear-gradient(135deg,rgba(255,77,106,0.06) 0%,rgba(255,77,106,0.01) 100%);}
+.outcome-mode{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;font-weight:700;margin-bottom:6px;}
+.outcome .outcome-mode{color:var(--accent);}
+.outcome.hitl .outcome-mode{color:var(--amber);}
+.outcome.esc .outcome-mode{color:var(--red);}
+.outcome-stats{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:10px;}
+.outcome-response{font-size:13px;color:var(--muted);line-height:1.7;background:rgba(0,0,0,0.25);padding:12px;border-left:2px solid var(--dim);}
 
-  /* Architecture Section */
-  #architecture { background:var(--black); }
-  .arch-label { font-family:'DM Mono',monospace; font-size:10px; font-weight:500; letter-spacing:0.2em; text-transform:uppercase; color:var(--accent); margin-bottom:16px; }
-  .arch-title { font-family:'DM Serif Display',serif; font-size:clamp(28px,4vw,42px); line-height:1.1; color:var(--text); margin-bottom:48px; }
-  .arch-title em { font-style:italic; color:var(--accent); }
+/* Architecture */
+.arch-section{padding:80px 0;border-bottom:1px solid var(--border);}
+.arch-layers{display:flex;flex-direction:column;gap:2px;margin-bottom:40px;}
+.arch-layer{display:grid;grid-template-columns:160px 1fr;background:var(--surface);overflow:hidden;}
+.arch-layer-name{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);background:var(--surface2);padding:16px;display:flex;align-items:center;border-right:2px solid var(--accent);}
+.arch-layer-content{padding:16px;font-size:13px;color:var(--muted);line-height:1.6;display:flex;align-items:center;}
+.arch-layer-content strong{color:var(--text);}
 
-  .arch-layers { display:flex; flex-direction:column; gap:2px; margin-bottom:48px; }
-  .arch-layer { display:grid; grid-template-columns:180px 1fr; gap:0; background:var(--surface); overflow:hidden; }
-  .arch-layer-name { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--accent); background:var(--surface2); padding:20px; display:flex; align-items:center; border-right:2px solid var(--accent); }
-  .arch-layer-content { padding:20px; font-size:13px; color:var(--muted); line-height:1.7; display:flex; align-items:center; }
-  .arch-layer-content strong { color:var(--text); }
+.tech-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:2px;margin:32px 0;}
+.tech-card{background:var(--surface);padding:20px;}
+.tech-name{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);margin-bottom:6px;}
+.tech-why{font-size:13px;color:var(--muted);line-height:1.6;}
 
-  .tech-badges { display:flex; flex-wrap:wrap; gap:10px; margin-top:32px; }
-  .tech-badge { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--accent); border:1px solid rgba(0,229,160,0.3); padding:6px 16px; transition:all 0.2s; }
-  .tech-badge:hover { background:rgba(0,229,160,0.1); }
+.callout{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);padding:20px 24px;margin-top:32px;}
+.callout-title{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--accent);margin-bottom:8px;}
+.callout-body{font-size:13px;color:var(--muted);line-height:1.7;}
+.callout-body strong{color:var(--text);}
 
-  /* Bottom Links */
-  .page-bottom { padding:60px; display:flex; flex-direction:column; align-items:center; gap:24px; border-top:1px solid var(--border); }
-  .case-study-link { font-family:'DM Mono',monospace; font-size:12px; letter-spacing:0.1em; color:var(--muted); text-decoration:none; transition:color 0.2s; }
-  .case-study-link:hover { color:var(--accent); }
+/* Bottom */
+.bottom-links{padding:60px 0;display:flex;flex-direction:column;align-items:center;gap:16px;}
+.bottom-link{font-family:'DM Mono',monospace;font-size:12px;letter-spacing:0.1em;color:var(--muted);text-decoration:none;transition:color 0.2s;}
+.bottom-link:hover{color:var(--accent);}
 
-  footer { background:var(--surface); border-top:1px solid var(--border); padding:24px 60px; display:flex; justify-content:space-between; align-items:center; }
-  .footer-copy { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.12em; color:var(--muted); }
-  .footer-edu span { color:var(--accent); }
-  .footer-edu { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.12em; color:var(--muted); }
+footer{background:var(--surface);border-top:1px solid var(--border);padding:24px 60px;display:flex;justify-content:space-between;align-items:center;}
+.footer-copy{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.12em;color:var(--muted);}
+.footer-edu{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.12em;color:var(--muted);}
+.footer-edu span{color:var(--accent);}
 
-  @media(max-width:900px) {
-    .back-link { padding:16px 24px; }
-    .page-header { padding:20px 24px 60px; }
-    section { padding:60px 24px; }
-    .principles-row { grid-template-columns:1fr 1fr; }
-    .demo-layout { grid-template-columns:1fr; }
-    .ticket-queue { max-height:300px; overflow-y:auto; }
-    .agent-content { max-height:none; }
-    .arch-layer { grid-template-columns:1fr; }
-    .arch-layer-name { border-right:none; border-bottom:2px solid var(--accent); }
-    footer { flex-direction:column; gap:8px; text-align:center; padding:24px; }
-    .page-bottom { padding:40px 24px; }
-  }
-  @media(max-width:500px) {
-    .principles-row { grid-template-columns:1fr; }
-  }
+@media(max-width:768px){
+  .wrap{padding:0 24px;}
+  .principles{grid-template-columns:1fr 1fr;}
+  .demo-layout{grid-template-columns:1fr;}
+  .queue{max-height:280px;overflow-y:auto;}
+  .panel-body{max-height:none;}
+  .arch-layer{grid-template-columns:1fr;}
+  .arch-layer-name{border-right:none;border-bottom:2px solid var(--accent);}
+  .tech-grid{grid-template-columns:1fr;}
+  footer{flex-direction:column;gap:8px;text-align:center;padding:24px;}
+}
+@media(max-width:480px){
+  .principles{grid-template-columns:1fr;}
+}
 </style>
 </head>
 <body>
 
-<a href="../index.html#projects" class="back-link">← Back to Portfolio</a>
+<div class="wrap">
+  <a href="../index.html#projects" class="back">← Back to Portfolio</a>
 
-<div class="page-header">
-  <div class="section-label">// Project 003</div>
-  <h1 class="page-title">IT Support Ticket<br>Triage & <em>Resolution</em></h1>
-  <div class="page-subtitle">Agentic AI · IT Ops · Project 003</div>
-  <p class="problem-statement">
-    Enterprise IT service desks process <strong>10,000–100,000+ tickets/month</strong>. Tier-1 costs <strong>~$22/ticket</strong>; escalations to Tier-3 exceed <strong>$104/ticket</strong>. 40–60% of volume is repetitive — password resets, VPN issues, software requests — yet still requires a human to read, classify, route, and resolve. This agent changes that: it classifies intent, retrieves relevant knowledge, executes safe resolutions autonomously, and escalates with full context when it can't.
-  </p>
+  <!-- SECTION 1: Hero + Problem -->
+  <div class="hero">
+    <div class="hero-label">// Project 003</div>
+    <h1>IT Support Ticket Triage<br>& <em>Resolution</em> Agent</h1>
+    <div class="hero-sub">Agentic AI system that classifies, retrieves, and resolves IT tickets autonomously</div>
 
-  <div class="principles-row">
-    <div class="principle-card">
-      <div class="principle-icon">🔒</div>
-      <div class="principle-title">Security-First</div>
-      <div class="principle-desc">Least privilege, audit everything. Every tool call logged and policy-gated.</div>
+    <div class="badges">
+      <span class="badge">n8n</span>
+      <span class="badge">Groq (Llama 3.3 70B)</span>
+      <span class="badge">Supabase</span>
+      <span class="badge">Slack</span>
     </div>
-    <div class="principle-card">
-      <div class="principle-icon">🤝</div>
-      <div class="principle-title">Human Trust Ramp</div>
-      <div class="principle-desc">Copilot → HITL → Lights-out. Autonomy earned incrementally through performance.</div>
-    </div>
-    <div class="principle-card">
-      <div class="principle-icon">🔌</div>
-      <div class="principle-title">Environment-Agnostic</div>
-      <div class="principle-desc">Works with ServiceNow, JSM, Zendesk. Adapter pattern for any ITSM.</div>
-    </div>
-    <div class="principle-card">
-      <div class="principle-icon">📊</div>
-      <div class="principle-title">Measurable ROI</div>
-      <div class="principle-desc">Every capability tied to a metric. Deflection rate, MTTR, cost per ticket.</div>
-    </div>
-  </div>
-</div>
 
-<section id="demo">
-  <div class="demo-label">// 02 · Interactive Demo</div>
-  <h2 class="demo-title">Watch the agent <em>think</em></h2>
-  <div class="demo-subtitle">Click a ticket to see step-by-step agent processing</div>
+    <p class="problem">
+      Enterprise IT service desks process <strong>10,000-100,000+ tickets per month</strong>. 40-60% of that volume is repetitive - password resets, VPN issues, software requests. This agent classifies tickets by intent and priority, searches a knowledge base for relevant articles, checks policy rules to determine the right level of autonomy, and either <strong>auto-resolves</strong>, <strong>routes for human approval</strong>, or <strong>escalates with full context</strong> - all through Slack.
+    </p>
 
-  <div class="demo-layout">
-    <div>
-      <div class="ticket-queue-header">Ticket Queue — 4 Incoming</div>
-      <div class="ticket-queue" id="ticketQueue">
-
-        <div class="ticket-card" data-ticket="1" onclick="processTicket(1)">
-          <div class="ticket-id">INC-4521</div>
-          <div class="ticket-subject">Can't log into my laptop - account locked</div>
-          <div class="ticket-meta">
-            <span class="ticket-meta-item">Sarah Chen · Marketing</span>
-            <span class="ticket-channel slack">Slack</span>
-            <span class="ticket-meta-item">9:14 AM</span>
-          </div>
-        </div>
-
-        <div class="ticket-card" data-ticket="2" onclick="processTicket(2)">
-          <div class="ticket-id">INC-4522</div>
-          <div class="ticket-subject">VPN keeps disconnecting every 5 minutes</div>
-          <div class="ticket-meta">
-            <span class="ticket-meta-item">James Miller · Engineering</span>
-            <span class="ticket-channel email">Email</span>
-            <span class="ticket-meta-item">9:22 AM</span>
-          </div>
-        </div>
-
-        <div class="ticket-card" data-ticket="3" onclick="processTicket(3)">
-          <div class="ticket-id">INC-4523</div>
-          <div class="ticket-subject">Need Figma installed for design sprint</div>
-          <div class="ticket-meta">
-            <span class="ticket-meta-item">Alex Rivera · Product</span>
-            <span class="ticket-channel portal">Portal</span>
-            <span class="ticket-meta-item">9:35 AM</span>
-          </div>
-        </div>
-
-        <div class="ticket-card" data-ticket="4" onclick="processTicket(4)">
-          <div class="ticket-id">INC-4524</div>
-          <div class="ticket-subject">Suspicious email - possible phishing</div>
-          <div class="ticket-meta">
-            <span class="ticket-meta-item">David Park · Finance</span>
-            <span class="ticket-channel slack">Slack</span>
-            <span class="ticket-meta-item">9:41 AM</span>
-          </div>
-        </div>
-
+    <div class="principles">
+      <div class="principle">
+        <div class="principle-title">Security-First</div>
+        <div class="principle-desc">Least privilege for every tool call. Every action audited. PII masked.</div>
+      </div>
+      <div class="principle">
+        <div class="principle-title">Human Trust Ramp</div>
+        <div class="principle-desc">Copilot to HITL to lights-out. Autonomy earned through measured performance.</div>
+      </div>
+      <div class="principle">
+        <div class="principle-title">Environment-Agnostic</div>
+        <div class="principle-desc">Adapter pattern for ServiceNow, JSM, Zendesk. Works with what exists.</div>
+      </div>
+      <div class="principle">
+        <div class="principle-title">Measurable ROI</div>
+        <div class="principle-desc">Every capability tied to a metric. Deflection rate, MTTR, cost per ticket.</div>
       </div>
     </div>
+  </div>
 
-    <div class="agent-panel">
-      <div class="agent-panel-header"><div class="pulse"></div> Agent Processing</div>
-      <div class="agent-content" id="agentContent">
-        <div class="agent-placeholder" id="agentPlaceholder">
-          <div class="agent-placeholder-icon">⚡</div>
-          <div class="agent-placeholder-text">Select a ticket to begin processing</div>
+  <!-- SECTION 2: Interactive Demo -->
+  <div class="demo-section">
+    <div class="section-num">// 02 - How It Works</div>
+    <h2 class="section-title">Watch the agent <em>think</em></h2>
+    <div class="section-sub">Click a ticket to see step-by-step agent processing</div>
+
+    <div class="demo-layout">
+      <div>
+        <div class="queue-header">Ticket Queue - 4 Incoming</div>
+        <div class="queue" id="queue">
+          <div class="ticket" data-id="1" onclick="processTicket(1)">
+            <span class="ticket-route l3">L3 Auto</span>
+            <div class="ticket-id">INC-5001</div>
+            <div class="ticket-msg">I'm locked out of my account and I have a client call in 15 minutes</div>
+            <div class="ticket-from">Sarah Chen - Marketing - Slack - 9:14 AM</div>
+          </div>
+          <div class="ticket" data-id="2" onclick="processTicket(2)">
+            <span class="ticket-route l2">L2 HITL</span>
+            <div class="ticket-id">INC-5002</div>
+            <div class="ticket-msg">VPN hasn't been working since the update last night</div>
+            <div class="ticket-from">James Miller - Engineering - Email - 9:22 AM</div>
+          </div>
+          <div class="ticket" data-id="3" onclick="processTicket(3)">
+            <span class="ticket-route l2">L2 HITL</span>
+            <div class="ticket-id">INC-5003</div>
+            <div class="ticket-msg">Need Figma installed for my design work</div>
+            <div class="ticket-from">Alex Rivera - Product - Portal - 9:35 AM</div>
+          </div>
+          <div class="ticket" data-id="4" onclick="processTicket(4)">
+            <span class="ticket-route esc">Escalate</span>
+            <div class="ticket-id">INC-5004</div>
+            <div class="ticket-msg">Got a weird email asking me to verify my credentials on some portal</div>
+            <div class="ticket-from">David Park - Finance - Slack - 9:41 AM</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header"><div class="dot"></div> Agent Processing</div>
+        <div class="panel-body" id="panelBody">
+          <div class="placeholder" id="placeholder">Select a ticket to begin processing</div>
         </div>
       </div>
     </div>
   </div>
-</section>
 
-<section id="architecture">
-  <div class="arch-label">// 03 · Architecture</div>
-  <h2 class="arch-title">How it's <em>built</em></h2>
+  <!-- SECTION 3: Architecture -->
+  <div class="arch-section">
+    <div class="section-num">// 03 - Architecture</div>
+    <h2 class="section-title">How it's <em>built</em></h2>
 
-  <div class="arch-layers">
-    <div class="arch-layer">
-      <div class="arch-layer-name">Intake Layer</div>
-      <div class="arch-layer-content"><strong>Slack Bot, Teams Bot, Email, Portal</strong>&nbsp;→ n8n webhooks normalize every channel into a unified ticket schema</div>
+    <div class="arch-layers">
+      <div class="arch-layer">
+        <div class="arch-layer-name">Intake</div>
+        <div class="arch-layer-content"><strong>Slack #it-support</strong>&nbsp;- n8n webhook receives messages, normalizes into unified ticket schema</div>
+      </div>
+      <div class="arch-layer">
+        <div class="arch-layer-name">Triage</div>
+        <div class="arch-layer-content"><strong>Groq / Llama 3.3 70B</strong>&nbsp;- classifies intent, priority, confidence via structured JSON output</div>
+      </div>
+      <div class="arch-layer">
+        <div class="arch-layer-name">Retrieval</div>
+        <div class="arch-layer-content"><strong>Supabase full-text search</strong>&nbsp;- matches ticket against 20 KB articles, returns top 3 with relevance scores</div>
+      </div>
+      <div class="arch-layer">
+        <div class="arch-layer-name">Policy Check</div>
+        <div class="arch-layer-content"><strong>Intent whitelist + confidence threshold</strong>&nbsp;- determines L3 (auto), L2 (approval), or escalation</div>
+      </div>
+      <div class="arch-layer">
+        <div class="arch-layer-name">Resolution</div>
+        <div class="arch-layer-content"><strong>Mock tool APIs</strong>&nbsp;(Azure AD, Okta, SCCM) - execute actions or post approval requests to Slack</div>
+      </div>
+      <div class="arch-layer">
+        <div class="arch-layer-name">Audit Log</div>
+        <div class="arch-layer-content"><strong>Supabase Postgres</strong>&nbsp;- every agent action logged with timestamp, tool, parameters, result</div>
+      </div>
     </div>
-    <div class="arch-layer">
-      <div class="arch-layer-name">Triage Agent</div>
-      <div class="arch-layer-content"><strong>Claude API structured output</strong>&nbsp;→ intent classification + priority scoring + confidence thresholds in a single call</div>
+
+    <div class="tech-grid">
+      <div class="tech-card">
+        <div class="tech-name">Groq</div>
+        <div class="tech-why">$0 cost, sub-second inference, Llama 3.3 70B with tool calling support. OpenAI-compatible API works with n8n's native Groq node.</div>
+      </div>
+      <div class="tech-card">
+        <div class="tech-name">n8n</div>
+        <div class="tech-why">Visual orchestration that's screenshot-able for a portfolio. Native Groq node, 400+ integrations, built-in Slack and HTTP nodes. Free self-hosted.</div>
+      </div>
+      <div class="tech-card">
+        <div class="tech-name">Supabase</div>
+        <div class="tech-why">Free Postgres with pgvector and full-text search. REST API built-in. Handles KB articles, tickets, and audit logs in one database.</div>
+      </div>
+      <div class="tech-card">
+        <div class="tech-name">Slack</div>
+        <div class="tech-why">Real-time user interface for ticket intake. Block Kit for approval buttons in HITL workflows. Native n8n integration.</div>
+      </div>
     </div>
-    <div class="arch-layer">
-      <div class="arch-layer-name">Knowledge Retrieval</div>
-      <div class="arch-layer-content"><strong>Supabase pgvector + Confluence KB</strong>&nbsp;→ RAG with citations, retrieves relevant articles and past resolutions</div>
-    </div>
-    <div class="arch-layer">
-      <div class="arch-layer-name">Resolution Engine</div>
-      <div class="arch-layer-content"><strong>Mock APIs (Azure AD, Intune, Jamf)</strong>&nbsp;→ tool execution with rollback support and audit logging</div>
-    </div>
-    <div class="arch-layer">
-      <div class="arch-layer-name">Policy & Approval</div>
-      <div class="arch-layer-content"><strong>Intent whitelist + Slack approval flow</strong>&nbsp;(n8n Wait node) → policy-gated autonomy per intent category</div>
-    </div>
-    <div class="arch-layer">
-      <div class="arch-layer-name">Observability</div>
-      <div class="arch-layer-content"><strong>Execution logs + audit trail + Grafana dashboard</strong>&nbsp;→ full traceability from intake to resolution</div>
+
+    <div class="callout">
+      <div class="callout-title">What's Real vs Mocked</div>
+      <div class="callout-body">
+        <strong>Real:</strong> LLM reasoning (Groq/Llama), workflow orchestration (n8n), knowledge base search (Supabase), Slack integration, audit logging, policy routing.<br>
+        <strong>Mocked:</strong> Tool execution (Azure AD, Okta, SCCM) uses an Express server returning realistic payloads. In production, each mock endpoint maps to a real enterprise API call. All mock responses are transparently labeled.
+      </div>
     </div>
   </div>
 
-  <div class="tech-badges">
-    <span class="tech-badge">n8n</span>
-    <span class="tech-badge">Claude API</span>
-    <span class="tech-badge">Supabase</span>
-    <span class="tech-badge">pgvector</span>
-    <span class="tech-badge">Slack</span>
-    <span class="tech-badge">Grafana</span>
-    <span class="tech-badge">Azure AD</span>
-    <span class="tech-badge">Intune</span>
-    <span class="tech-badge">Jamf</span>
+  <div class="bottom-links">
+    <a href="../case-studies/it-triage-agent.html" class="bottom-link">View Full Case Study →</a>
+    <a href="https://github.com/dineshpant954/portfolio/tree/main/it-triage-agent" class="bottom-link" target="_blank">View Source Code →</a>
+    <a href="../index.html#projects" class="bottom-link">← Back to Portfolio</a>
   </div>
-</section>
-
-<div class="page-bottom">
-  <a href="../case-studies/it-triage-agent.html" class="case-study-link">Read the full 12-section case study →</a>
-  <a href="../index.html#projects" class="case-study-link">← Back to Portfolio</a>
 </div>
 
 <footer>
-  <div class="footer-copy">© 2026 Dinesh Pant · All rights reserved</div>
-  <div class="footer-edu">MBA · <span>Kelley School of Business</span> · May 2026</div>
+  <div class="footer-copy">&copy; 2026 Dinesh Pant</div>
+  <div class="footer-edu">MBA - <span>Kelley School of Business</span> - May 2026</div>
 </footer>
 
 <script>
-const ticketData = {
+const DATA = {
   1: {
     triage: {
-      intent: 'account_unlock',
-      confidence: '97%',
-      priority: 'P2-High',
-      priorityClass: 'p2',
-      category: 'Access & Identity'
+      intent: 'account_unlock', confidence: '94%', priority: 'P2-High', priorityClass: 'p2', category: 'Access & Identity'
     },
-    retrieval: [
-      { id: 'KB-1024', title: 'Account Lockout Self-Service', score: '94%' },
-      { id: 'INC-3892', title: 'Similar resolved — account unlock via Azure AD', score: '87%' }
+    kb: [
+      { id: 'KB-1002', title: 'Account Lockout After Failed Attempts', score: '0.91' }
     ],
-    resolution: {
-      mode: 'lights-out',
-      modeLabel: 'Lights-Out (L3)',
-      steps: [
-        { action: 'verify_identity', detail: 'Okta Verify push → success', time: '2s', status: '✓' },
-        { action: 'unlock_account', detail: 'Azure AD API → success', time: '1s', status: '✓' },
-        { action: 'reset_password', detail: 'Generate temp password → success', time: '1s', status: '✓' },
-        { action: 'notify_user', detail: 'Slack DM with reset link → success', time: '1s', status: '✓' }
-      ],
-      totalTime: '47 seconds',
-      audit: 'TOOL_CALL azure_ad.unlock_account | user: sarah.chen | approver: AUTO (L3 policy) | id: AUD-9821'
+    route: { mode: 'lights_out', label: 'L3 Lights-Out', reason: 'Policy allows autonomous resolution. Confidence (0.94) above threshold (0.85).' },
+    steps: [
+      { action: 'okta.verify_identity', detail: 'Push notification sent, identity verified', time: '2s', icon: '\u2713' },
+      { action: 'azure_ad.unlock_account', detail: 'Account unlocked, 5 failed attempts cleared', time: '1s', icon: '\u2713' },
+      { action: 'azure_ad.reset_password', detail: 'Temporary password generated, sent via secure email', time: '1s', icon: '\u2713' },
+      { action: 'slack.notify_user', detail: 'Resolution message posted in thread', time: '1s', icon: '\u2713' }
+    ],
+    outcome: {
+      mode: 'Lights-Out (L3)', cls: '', time: '47 seconds', audit: '5 entries logged',
+      response: 'Your account has been unlocked. Your lockout was caused by 5 failed login attempts. A temporary password has been sent to your registered email. It expires in 24 hours - please update your password at https://passwordreset.company.com. For your upcoming call, you should be able to log in now.'
     }
   },
   2: {
     triage: {
-      intent: 'vpn_connectivity',
-      confidence: '93%',
-      priority: 'P3-Medium',
-      priorityClass: 'p3',
-      category: 'Connectivity'
+      intent: 'vpn_troubleshoot', confidence: '87%', priority: 'P3-Medium', priorityClass: 'p3', category: 'Connectivity'
     },
-    retrieval: [
-      { id: 'KB-2187', title: 'GlobalProtect 6.x Known Issues', score: '91%' },
-      { id: 'KB-2201', title: 'VPN Troubleshooting Runbook', score: '85%' },
-      { id: 'INC-4498', title: 'Similar resolved — GP 6.1.2 disconnect issue', score: '92%' }
+    kb: [
+      { id: 'KB-2001', title: 'VPN Connection Troubleshooting', score: '0.88' },
+      { id: 'KB-2002', title: 'VPN Client Update Deployment', score: '0.79' }
     ],
-    resolution: {
-      mode: 'hitl',
-      modeLabel: 'HITL (L2) — Agent Approval Required',
-      steps: [
-        { action: 'diagnose', detail: 'Client 6.1.2 matches known issue → diagnosed', time: '3s', status: '✓' },
-        { action: 'enrich', detail: 'CMDB lookup device info → success', time: '2s', status: '✓' },
-        { action: 'propose', detail: 'Push GP 6.1.4 via Jamf → AWAITING APPROVAL', time: '', status: '◷' },
-        { action: 'draft_reply', detail: 'Generated response for agent review → drafted', time: '2s', status: '✓' }
-      ],
-      totalTime: '~8 min including agent review',
-      audit: 'Action proposed: TOOL_CALL jamf.deploy_package | pkg: GlobalProtect-6.1.4 | target: LP-2910 | awaiting: L1 approval'
+    route: { mode: 'hitl', label: 'L2 HITL', reason: 'Policy requires approval before software deployment. Agent proposes fix, human approves.' },
+    steps: [
+      { action: 'cmdb.query_asset', detail: 'Device: Dell Latitude 5540, AnyConnect 4.9.x, macOS Sonoma', time: '2s', icon: '\u2713' },
+      { action: 'diagnose', detail: 'AnyConnect 4.9.x has known crash on macOS Sonoma (KB-2001 match)', time: '3s', icon: '\u2713' },
+      { action: 'propose_fix', detail: 'Push AnyConnect 4.10.08029 via SCCM', time: '1s', icon: '\u2713' },
+      { action: '#agent-approvals', detail: 'Approval request posted with context + proposed action', time: '1s', icon: '\u25F7' },
+      { action: 'approval_received', detail: 'L1 agent approved deployment', time: '~2 min', icon: '\u2713' },
+      { action: 'sccm.deploy_software', detail: 'AnyConnect 4.10.08029 deployment queued', time: '1s', icon: '\u2713' },
+      { action: 'slack.notify_user', detail: 'Diagnosis + ETA posted in thread', time: '1s', icon: '\u2713' }
+    ],
+    outcome: {
+      mode: 'HITL (L2) - Agent Approval Required', cls: 'hitl', time: '~3 min (including approval)', audit: '7 entries logged',
+      response: "I've identified the issue - your VPN client (Cisco AnyConnect 4.9.x) has a known compatibility problem with macOS Sonoma. I've queued an update to version 4.10. You should receive an install notification within 15 minutes. In the meantime, you can try connecting using TCP fallback: open AnyConnect > Settings > enable 'Allow local LAN access.'"
     }
   },
   3: {
     triage: {
-      intent: 'software_install',
-      confidence: '95%',
-      priority: 'P4-Low',
-      priorityClass: 'p4',
-      category: 'Software'
+      intent: 'software_install', confidence: '91%', priority: 'P3-Medium', priorityClass: 'p3', category: 'Software'
     },
-    retrieval: [
-      { id: 'KB-3001', title: 'Software Catalog', score: '88%' },
-      { id: 'POLICY', title: 'Design Tools Entitlement Matrix', score: '90%' }
+    kb: [
+      { id: 'KB-3001', title: 'Standard Software Catalog', score: '0.87' },
+      { id: 'KB-3002', title: 'Software Install Request Process', score: '0.82' }
     ],
-    resolution: {
-      mode: 'hitl',
-      modeLabel: 'HITL (L2) — Policy Check + Deploy',
-      steps: [
-        { action: 'policy_check', detail: 'Figma in approved catalog, Product role entitled → success', time: '1s', status: '✓' },
-        { action: 'license_check', detail: '8 of 50 licenses available → success', time: '2s', status: '✓' },
-        { action: 'approval_check', detail: 'Manager pre-approval → verify via workflow → pending', time: '', status: '◷' },
-        { action: 'deploy', detail: 'Queue Intune deployment → queued', time: '', status: '◷' }
-      ],
-      totalTime: '~30 min pending manager confirmation',
-      audit: 'TOOL_CALL intune.deploy_app | app: Figma Desktop | target: LP-3847 | approval: pending mgr confirmation'
+    route: { mode: 'hitl', label: 'L2 HITL', reason: 'Software install requires entitlement verification and manager approval per policy.' },
+    steps: [
+      { action: 'policy_check', detail: 'Figma in approved catalog, restricted to Design team', time: '1s', icon: '\u2713' },
+      { action: 'entitlement_check', detail: 'User department: Product (Design-entitled)', time: '1s', icon: '\u2713' },
+      { action: 'license_check', detail: '42 of 50 Figma licenses available', time: '1s', icon: '\u2713' },
+      { action: 'approval_request', detail: 'Manager notified for approval via workflow', time: '1s', icon: '\u25F7' },
+      { action: 'sccm.deploy_software', detail: 'Figma Desktop queued for deployment on approval', time: '1s', icon: '\u25F7' },
+      { action: 'slack.notify_user', detail: 'Status update posted in thread', time: '1s', icon: '\u2713' }
+    ],
+    outcome: {
+      mode: 'HITL (L2) - Manager Approval Required', cls: 'hitl', time: '~2 min (pending approval)', audit: '6 entries logged',
+      response: "Figma is available in our software catalog but is restricted to the Design team. I've verified your department membership and submitted the install request. Your manager has been notified for approval. Once approved, Figma will be deployed to your laptop automatically - ETA 30 minutes after approval."
     }
   },
   4: {
     triage: {
-      intent: 'security_incident_report',
-      confidence: '96%',
-      priority: 'P1-Critical',
-      priorityClass: 'p1',
-      category: 'Security'
+      intent: 'phishing_report', confidence: '93%', priority: 'P2-High', priorityClass: 'p2', category: 'Security',
+      security: true
     },
-    retrieval: [
-      { id: 'KB-5010', title: 'Phishing Report Procedure', score: '95%' },
-      { id: 'RUNBOOK', title: 'Phishing Triage Workflow', score: '93%' }
+    kb: [
+      { id: 'KB-4001', title: 'Phishing Email Reporting Procedure', score: '0.92' }
     ],
-    resolution: {
-      mode: 'escalated',
-      modeLabel: 'ESCALATE — Security incidents NEVER auto-resolved',
-      steps: [
-        { action: 'classify', detail: 'SECURITY_INCIDENT → hardcoded escalation', time: '1s', status: '↗' },
-        { action: 'enrich', detail: 'Extract sender domain company-security.xyz → not trusted', time: '1s', status: '✓' },
-        { action: 'escalate', detail: 'Route to SecOps L2 with context package', time: '1s', status: '↗' },
-        { action: 'notify_user', detail: '"Good catch David! Our security team has been notified. Do NOT click any links."', time: '1s', status: '✓' }
-      ],
-      totalTime: '12 seconds to escalate',
-      audit: 'ESCALATION: Security incident → SecOps queue | reason: POLICY_BLOCK (security_incident_report not in auto-resolve whitelist)'
+    route: { mode: 'escalate', label: 'ESCALATE', reason: 'Security incidents are NEVER auto-resolved. Hardcoded policy: always escalate to SecOps.' },
+    steps: [
+      { action: 'classify', detail: 'SECURITY_INCIDENT - hardcoded escalation triggered', time: '1s', icon: '\u2197' },
+      { action: 'enrich', detail: 'Extracted context: suspicious credential verification request', time: '1s', icon: '\u2713' },
+      { action: 'escalate_to_secops', detail: 'Full context package sent to #secops with KB reference', time: '1s', icon: '\u2197' },
+      { action: 'slack.notify_user', detail: 'Safety instructions posted in thread', time: '1s', icon: '\u2713' }
+    ],
+    outcome: {
+      mode: 'ESCALATE - Security Incident', cls: 'esc', time: '12 seconds', audit: '4 entries logged',
+      response: "Thank you for reporting this. I've flagged this as a potential phishing attempt and escalated it to our Security Operations team (Ticket: INC-5004). Important: Do NOT click any links in that email. Do NOT reply to it. If you already entered credentials, please let the security team know immediately - they'll be reaching out shortly."
     }
   }
 };
 
-let isProcessing = false;
+let processing = false;
 
-function processTicket(ticketId) {
-  if (isProcessing) return;
-  isProcessing = true;
+function processTicket(id) {
+  if (processing) return;
+  processing = true;
 
-  // Update active ticket
-  document.querySelectorAll('.ticket-card').forEach(c => c.classList.remove('active'));
-  document.querySelector(`[data-ticket="${ticketId}"]`).classList.add('active');
+  document.querySelectorAll('.ticket').forEach(t => t.classList.remove('active'));
+  document.querySelector('[data-id="' + id + '"]').classList.add('active');
 
-  const data = ticketData[ticketId];
-  const content = document.getElementById('agentContent');
-  content.innerHTML = '';
+  const d = DATA[id];
+  const body = document.getElementById('panelBody');
+  const allSteps = [];
 
-  const steps = [];
+  // Step 1: Triage
+  let secPill = d.triage.security ? '<span class="pill pill-sec">SECURITY INCIDENT</span>' : '';
+  allSteps.push('<div class="step" id="s0"><div class="step-head"><div class="step-badge">Step 1</div><div class="step-name">Triage Agent</div></div><div class="pills"><span class="pill pill-intent">' + d.triage.intent + '</span><span class="pill pill-conf">' + d.triage.confidence + ' confidence</span><span class="pill pill-' + d.triage.priorityClass + '">' + d.triage.priority + '</span><span class="pill pill-cat">' + d.triage.category + '</span>' + secPill + '</div></div>');
 
-  // Step 1: Triage Agent
-  const triageHTML = `
-    <div class="agent-step" id="step-triage">
-      <div class="step-header">
-        <div class="step-badge">Step 1</div>
-        <div class="step-title">Triage Agent</div>
-      </div>
-      <div class="classification-grid">
-        <span class="pill pill-intent">${data.triage.intent}</span>
-        <span class="pill pill-confidence">${data.triage.confidence} confidence</span>
-        <span class="pill pill-priority ${data.triage.priorityClass}">${data.triage.priority}</span>
-        <span class="pill pill-category">${data.triage.category}</span>
-      </div>
-    </div>
-  `;
-  steps.push(triageHTML);
-
-  // Step 2: Retrieval Agent
-  let kbHTML = '';
-  data.retrieval.forEach(kb => {
-    kbHTML += `
-      <div class="kb-article">
-        <div>
-          <div class="kb-article-title">${kb.title}</div>
-          <div class="kb-article-id">${kb.id}</div>
-        </div>
-        <div class="kb-score">${kb.score}</div>
-      </div>
-    `;
+  // Step 2: KB Retrieval
+  let kbHtml = '';
+  d.kb.forEach(function(k) {
+    kbHtml += '<div class="kb-item"><div><div class="kb-title">' + k.title + '</div><div class="kb-id">' + k.id + '</div></div><div class="kb-score">' + k.score + '</div></div>';
   });
-  const retrievalHTML = `
-    <div class="agent-step" id="step-retrieval">
-      <div class="step-header">
-        <div class="step-badge">Step 2</div>
-        <div class="step-title">Retrieval Agent</div>
-      </div>
-      ${kbHTML}
-    </div>
-  `;
-  steps.push(retrievalHTML);
+  allSteps.push('<div class="step" id="s1"><div class="step-head"><div class="step-badge">Step 2</div><div class="step-name">Knowledge Base Search</div></div>' + kbHtml + '</div>');
 
-  // Step 3+: Resolution steps (each as separate animated step)
-  data.resolution.steps.forEach((step, i) => {
-    const resHTML = `
-      <div class="agent-step" id="step-res-${i}">
-        <div class="step-header">
-          <div class="step-badge">Step ${3 + i}</div>
-          <div class="step-title">${step.action}</div>
-        </div>
-        <div class="resolution-step">
-          <div class="res-status">${step.status}</div>
-          <div class="res-content">
-            <div class="res-action">${step.action}</div>
-            <div class="res-detail">${step.detail}</div>
-            ${step.time ? `<div class="res-time">${step.time}</div>` : ''}
-          </div>
-        </div>
-      </div>
-    `;
-    steps.push(resHTML);
+  // Step 3: Policy/Route
+  allSteps.push('<div class="step" id="s2"><div class="step-head"><div class="step-badge">Step 3</div><div class="step-name">Policy Check</div></div><div style="font-family:\'DM Mono\',monospace;font-size:11px;color:var(--muted);line-height:1.7;"><strong style="color:var(--text)">' + d.route.label + '</strong><br>' + d.route.reason + '</div></div>');
+
+  // Step 4+: Resolution steps
+  d.steps.forEach(function(s, i) {
+    allSteps.push('<div class="step" id="s' + (3 + i) + '"><div class="step-head"><div class="step-badge">Step ' + (4 + i) + '</div><div class="step-name">' + s.action + '</div></div><div class="res-step"><div class="res-icon">' + s.icon + '</div><div class="res-text"><div class="res-action">' + s.action + '</div><div class="res-detail">' + s.detail + (s.time ? ' (' + s.time + ')' : '') + '</div></div></div></div>');
   });
 
-  // Outcome card
-  const outcomeClass = data.resolution.mode === 'escalated' ? 'escalated' : data.resolution.mode === 'hitl' ? 'hitl' : '';
-  const outcomeHTML = `
-    <div class="agent-step" id="step-outcome">
-      <div class="outcome-card ${outcomeClass}">
-        <div class="outcome-header">
-          <div class="outcome-mode">${data.resolution.modeLabel}</div>
-        </div>
-        <div class="outcome-time">Total: ${data.resolution.totalTime}</div>
-        <div class="outcome-audit">${data.resolution.audit}</div>
-      </div>
-    </div>
-  `;
-  steps.push(outcomeHTML);
+  // Outcome
+  allSteps.push('<div class="step" id="s-out"><div class="outcome ' + d.outcome.cls + '"><div class="outcome-mode">' + d.outcome.mode + '</div><div class="outcome-stats">Total: ' + d.outcome.time + ' | Audit: ' + d.outcome.audit + '</div><div class="outcome-response">' + d.outcome.response + '</div></div></div>');
 
-  // Insert all steps as hidden
-  content.innerHTML = steps.join('');
+  body.innerHTML = allSteps.join('');
 
-  // Animate steps one by one
-  const stepElements = content.querySelectorAll('.agent-step');
-  stepElements.forEach((el, i) => {
-    setTimeout(() => {
-      el.classList.add('visible');
-      if (i === stepElements.length - 1) {
-        isProcessing = false;
-      }
-    }, 750 * (i + 1));
+  // Animate
+  var els = body.querySelectorAll('.step');
+  els.forEach(function(el, i) {
+    setTimeout(function() {
+      el.classList.add('show');
+      if (i === els.length - 1) processing = false;
+    }, 700 * (i + 1));
   });
 }
 </script>

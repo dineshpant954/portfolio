@@ -103,8 +103,12 @@
   .project-metric { display:flex; align-items:baseline; gap:10px; font-family:'DM Mono',monospace; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--accent); border-top:1px solid var(--border); padding-top:20px; }
   .project-metric strong { font-family:'DM Serif Display',serif; font-size:32px; color:var(--accent); line-height:1; }
   .project-type { position:absolute; top:24px; right:24px; font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.15em; text-transform:uppercase; color:var(--dim); }
-  .project-demo-btn { display:inline-block; font-family:'DM Mono',monospace; font-size:11px; font-weight:500; letter-spacing:0.12em; text-transform:uppercase; color:var(--accent); background:transparent; border:1px solid rgba(0,229,160,0.4); padding:10px 24px; text-decoration:none; transition:all 0.25s ease; margin-top:16px; }
-  .project-demo-btn:hover { background:var(--accent); color:var(--black); border-color:var(--accent); transform:translateY(-2px); box-shadow:0 6px 24px rgba(0,229,160,0.25); }
+  .project-btns { display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; }
+  .project-btn { display:inline-block; font-family:'DM Mono',monospace; font-size:11px; font-weight:500; letter-spacing:0.1em; text-transform:uppercase; padding:9px 18px; text-decoration:none; border:1px solid var(--dim); color:var(--muted); border-radius:3px; transition:all 0.2s ease; }
+  .project-btn:hover { border-color:var(--muted); color:var(--text); background:rgba(255,255,255,0.04); }
+  .project-btn.primary { background:var(--accent); color:var(--black); border-color:var(--accent); }
+  .project-btn.primary:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,229,160,0.25); }
+  .project-status { display:inline-block; font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.15em; text-transform:uppercase; color:var(--dim); border:1px solid rgba(255,255,255,0.06); padding:4px 10px; margin-top:16px; border-radius:2px; }
 
   .project-card.featured { grid-column:span 2; display:grid; grid-template-columns:1fr 1fr; gap:60px; align-items:start; background:linear-gradient(135deg,var(--surface2) 0%,rgba(0,229,160,0.04) 100%); }
   .featured-badge { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.2em; text-transform:uppercase; color:var(--black); background:var(--accent); padding:4px 12px; display:inline-block; margin-bottom:20px; }
@@ -355,6 +359,7 @@
         <div class="module-item"><div class="module-num">STEP 02</div><div class="module-title">Health Check & Flag</div><div class="module-desc">Runs daily anomaly detection: stale deals past stage benchmarks, missing required fields, deal size vs. engagement mismatch, ownership gaps.</div></div>
         <div class="module-item"><div class="module-num">STEP 03</div><div class="module-title">Prioritized Action List</div><div class="module-desc">Generates a ranked list of deals needing attention with AI-generated reasoning: "Acme Corp $2.3M — 12 days in ETO review, avg is 5 days, no engineer assigned."</div></div>
         <div class="module-item"><div class="module-num">STEP 04</div><div class="module-title">Auto-Draft & Report</div><div class="module-desc">Drafts nudge messages to deal owners and produces a weekly pipeline health report with risk scores — ready for human review before send.</div></div>
+        <div class="project-status">In Development</div>
       </div>
     </div>
 
@@ -363,6 +368,7 @@
       <div class="project-num">002</div>
       <div class="project-title">Invoice Processing & AP Automation</div>
       <div class="project-desc">Upload any vendor invoice — different formats, different vendors. The agent extracts line items, matches against a PO database, flags mismatches with resolution suggestions ("Invoice $14,200 but PO #4458 authorized $12,800 — line item 3 quantity differs"), and auto-routes clean matches for approval. Same pattern as sales ops, different domain.</div>
+      <div class="project-status">In Development</div>
       <div class="project-metric"><strong>Finance</strong> Same pattern, new domain</div>
     </div>
 
@@ -371,7 +377,10 @@
       <div class="project-num">003</div>
       <div class="project-title">IT Support Ticket Triage & Resolution</div>
       <div class="project-desc">The most "pure agentic" pattern — the agent actually resolves things, not just flags them. Classifies tickets, searches the knowledge base, attempts auto-resolution with the user, and escalates to L2 with full context when needed. Core PM question built in: when should the agent act vs. hand off to a human?</div>
-      <a href="projects/it-triage-agent.html" class="project-demo-btn">Launch Demo →</a>
+      <div class="project-btns">
+        <a href="projects/it-triage-agent.html" class="project-btn primary">View Architecture & Demo →</a>
+        <a href="https://github.com/dineshpant954/portfolio/tree/main/it-triage-agent" class="project-btn" target="_blank">View Code on GitHub →</a>
+      </div>
       <div class="project-metric"><strong>Trust</strong> Calibrated autonomy</div>
     </div>
 
@@ -380,6 +389,7 @@
       <div class="project-num">004</div>
       <div class="project-title">Sales Proposal / RFP Auto-Drafting</div>
       <div class="project-desc">Upload an RFP. The agent extracts requirements and evaluation criteria, pulls matching content from a proposal library, generates a first-draft with executive summary, solution mapping, and pricing framework — then flags gaps: "RFP requires ISO 27001 certification — no matching content found. Flag for SME input." Assembly in minutes, not days.</div>
+      <div class="project-status">In Development</div>
       <div class="project-metric"><strong>Days → Minutes</strong> Proposal assembly</div>
     </div>
 
