@@ -10,7 +10,10 @@ services:
       - N8N_BASIC_AUTH_ACTIVE=true
       - N8N_BASIC_AUTH_USER=${N8N_USER:-admin}
       - N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD:-admin}
-      - WEBHOOK_URL=http://localhost:5678/
+      - N8N_PROTOCOL=${N8N_PROTOCOL:-http}
+      - N8N_HOST=${N8N_HOST:-localhost}
+      - N8N_PORT=${N8N_PORT:-5678}
+      - WEBHOOK_URL=${WEBHOOK_URL:-http://localhost:5678/}
       - GENERIC_TIMEZONE=America/Indiana/Indianapolis
     volumes:
       - n8n_data:/home/node/.n8n
@@ -21,6 +24,14 @@ services:
       - "3001:3001"
     environment:
       - PORT=3001
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    profiles:
+      - tunnel
+    depends_on:
+      - n8n
 
 volumes:
   n8n_data:

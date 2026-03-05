@@ -98,6 +98,61 @@ docker compose up -d
 # Go to Slack #it-support, type: "I'm locked out of my account"
 ```
 
+
+## Expose n8n to Slack (Option B)
+
+Slack Events API cannot call `http://localhost:5678` because Slack must reach a public HTTPS endpoint. For local self-hosting, run n8n in Docker and expose it with Cloudflare Tunnel.
+
+### Option B1: Quick Tunnel (free, no domain required)
+
+```bash
+./scripts/start_tunnel_quick.sh
+```
+
+The script starts n8n + mock-apis + cloudflared and prints a URL like `https://random-subdomain.trycloudflare.com`.
+
+Then update n8n so webhook URLs are generated with that public base URL:
+
+```bash
+./scripts/restart_with_webhook_url.sh https://random-subdomain.trycloudflare.com
+```
+
+Next:
+1. Open n8n (`http://localhost:5678`) and open your **Slack Trigger** node.
+2. Copy the **Production Webhook URL** from the node.
+3. In Slack App settings, go to **Event Subscriptions** and paste that full URL into **Request URL**.
+4. Slack sends a challenge POST to verify the endpoint. Once verified, enable events.
+
+### Option B2: Named Cloudflare Tunnel (stable URL with domain)
+
+Use this if you have Cloudflare Zero Trust and a domain in Cloudflare:
+
+1. In Cloudflare dashboard, create a tunnel and map a DNS hostname (for example `n8n.example.com`) to it.
+2. Put the tunnel token in `.env`:
+   ```bash
+   CLOUDFLARED_TUNNEL_TOKEN=<your-token>
+   ```
+3. Update `cloudflared/config.yml` hostname placeholder.
+4. Start with token mode:
+   ```bash
+   docker compose -f docker-compose.yml -f docker-compose.tunnel.token.yml up -d
+   ```
+5. Set public webhook base URL for n8n:
+   ```bash
+   ./scripts/restart_with_webhook_url.sh https://n8n.example.com
+   ```
+6. In n8n Slack Trigger, copy Production Webhook URL and paste it into Slack Event Subscriptions Request URL.
+
+### n8n webhook environment variables
+
+n8n webhook generation depends on:
+- `N8N_PROTOCOL`
+- `N8N_HOST`
+- `N8N_PORT`
+- `WEBHOOK_URL` (recommended when behind reverse proxy/tunnel)
+
+For Slack, always use an HTTPS `WEBHOOK_URL` that points at your public tunnel base URL and includes a trailing slash.
+
 ## Sample Interactions
 
 ### 1. Password Lockout - Lights-Out (L3)
