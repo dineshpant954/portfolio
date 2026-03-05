@@ -1,0 +1,614 @@
+{
+  "name": "IT Support Triage Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "event": "message",
+        "channel": "#it-support",
+        "options": {
+          "ignore_bots": true
+        }
+      },
+      "id": "slack-trigger",
+      "name": "Slack Trigger",
+      "type": "n8n-nodes-base.slackTrigger",
+      "typeVersion": 1,
+      "position": [240, 300],
+      "notes": "Listens for new messages in #it-support. Ignores bot messages to prevent loops."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract ticket info from Slack message\nconst message = $input.first().json;\nconst ticketId = 'INC-' + String(Math.floor(10000 + Math.random() * 90000));\n\nreturn [{\n  json: {\n    ticket_id: ticketId,\n    raw_text: message.text || message.event?.text || '',\n    user_id: message.user || message.event?.user || 'unknown',\n    user_name: message.user_name || message.event?.user || 'unknown',\n    channel: message.channel || message.event?.channel || '',\n    thread_ts: message.ts || message.event?.ts || '',\n    source: 'slack',\n    timestamp: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "extract-message",
+      "name": "Extract Message",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300],
+      "notes": "Extracts message text, user info, and generates a ticket ID"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.SUPABASE_URL }}/rest/v1/tickets",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $env.SUPABASE_ANON_KEY }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $env.SUPABASE_SERVICE_KEY }}" },
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "Prefer", "value": "return=representation" }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "ticket_id", "value": "={{ $json.ticket_id }}" },
+            { "name": "source", "value": "slack" },
+            { "name": "user_id", "value": "={{ $json.user_id }}" },
+            { "name": "user_name", "value": "={{ $json.user_name }}" },
+            { "name": "raw_text", "value": "={{ $json.raw_text }}" },
+            { "name": "slack_channel", "value": "={{ $json.channel }}" },
+            { "name": "slack_thread_ts", "value": "={{ $json.thread_ts }}" },
+            { "name": "status", "value": "open" }
+          ]
+        }
+      },
+      "id": "create-ticket",
+      "name": "Create Ticket in Supabase",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [680, 300],
+      "notes": "Inserts new ticket record into Supabase tickets table"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Classify this IT support ticket:\n\n{{ $('Extract Message').item.json.raw_text }}",
+        "options": {
+          "systemMessage": "You are an IT Support Triage Agent for a mid-size technology company (15,000 employees).\n\nOrganization Context:\n- Azure AD for identity, Okta for MFA, Cisco AnyConnect for VPN, SCCM/Intune for endpoint management, Slack for communication\n- SLAs: P1=1h response/4h resolve, P2=4h/24h, P3=8h/3d, P4=24h/5d\n\nGiven a user's message, respond with ONLY a valid JSON object (no markdown, no backticks, no extra text):\n\n{\"category\": \"access_identity|connectivity|software|hardware|email_collaboration|security|service_request\", \"subcategory\": \"<specific issue>\", \"intent\": \"<machine_readable_intent>\", \"priority\": \"P1|P2|P3|P4\", \"confidence\": <0.0-1.0>, \"summary\": \"<1-2 sentences>\", \"search_terms\": \"<3-5 keywords>\", \"is_security_incident\": true|false, \"reasoning\": \"<brief explanation>\"}\n\nPRIORITY: P1=service down/security/executive/10+ users. P2=user blocked. P3=inconvenienced but working. P4=enhancement/question.\nSECURITY: phishing/malware/suspicious email/unauthorized access -> is_security_incident: true, ALWAYS.\nCONFIDENCE: >0.90 clear intent, 0.80-0.90 likely, 0.60-0.80 uncertain, <0.60 too vague."
+        }
+      },
+      "id": "triage-agent",
+      "name": "Triage Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [900, 300],
+      "notes": "Classifies the ticket using Groq/Llama 3.3 70B. Outputs structured JSON with intent, priority, confidence."
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {
+          "temperature": 0.1,
+          "maxTokens": 1024
+        }
+      },
+      "id": "groq-triage-model",
+      "name": "Groq Chat Model (Triage)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [900, 500],
+      "notes": "Groq Llama 3.3 70B - low temperature for consistent classification"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse classification from Groq response\nconst rawResponse = $input.first().json.output || $input.first().json.text || '';\nconst ticketData = $('Extract Message').first().json;\n\nlet classification;\ntry {\n  // Try to extract JSON from the response\n  let jsonStr = rawResponse;\n  \n  // Handle markdown code blocks\n  const jsonMatch = rawResponse.match(/```(?:json)?\\s*([\\s\\S]*?)```/);\n  if (jsonMatch) {\n    jsonStr = jsonMatch[1].trim();\n  }\n  \n  // Handle case where response has text before/after JSON\n  const braceMatch = rawResponse.match(/\\{[\\s\\S]*\\}/);\n  if (braceMatch) {\n    jsonStr = braceMatch[0];\n  }\n  \n  classification = JSON.parse(jsonStr);\n} catch (e) {\n  // Fallback classification if parsing fails\n  classification = {\n    category: 'service_request',\n    subcategory: 'unknown',\n    intent: 'unknown',\n    priority: 'P3',\n    confidence: 0.30,\n    summary: 'Unable to parse classification. Routing to human triage.',\n    search_terms: ticketData.raw_text.split(' ').slice(0, 5).join(' '),\n    is_security_incident: false,\n    reasoning: 'Classification parsing failed. Defaulting to human triage.'\n  };\n}\n\n// Validate and set defaults\nconst validPriorities = ['P1', 'P2', 'P3', 'P4'];\nif (!validPriorities.includes(classification.priority)) {\n  classification.priority = 'P3';\n}\n\nif (typeof classification.confidence !== 'number' || classification.confidence < 0 || classification.confidence > 1) {\n  classification.confidence = 0.50;\n}\n\n// Force security check on keywords\nconst securityKeywords = ['phishing', 'malware', 'suspicious', 'hack', 'breach', 'unauthorized', 'virus', 'ransomware'];\nconst textLower = ticketData.raw_text.toLowerCase();\nfor (const keyword of securityKeywords) {\n  if (textLower.includes(keyword)) {\n    classification.is_security_incident = true;\n    classification.priority = 'P1';\n    break;\n  }\n}\n\nreturn [{\n  json: {\n    ...ticketData,\n    classification\n  }\n}];"
+      },
+      "id": "parse-classification",
+      "name": "Parse Classification",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1120, 300],
+      "notes": "Parses JSON from Groq response. Handles malformed output, sets defaults, enforces security keyword checks."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.SUPABASE_URL }}/rest/v1/rpc/search_kb_text",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $env.SUPABASE_ANON_KEY }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $env.SUPABASE_SERVICE_KEY }}" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"search_query\": \"{{ $json.classification.search_terms }}\", \"match_count\": 3}"
+      },
+      "id": "search-kb",
+      "name": "Search Knowledge Base",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [1340, 300],
+      "notes": "Calls search_kb_text RPC function in Supabase. Returns top 3 matching KB articles by full-text relevance."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.SUPABASE_URL }}/rest/v1/policy_rules?intent=eq.{{ $('Parse Classification').item.json.classification.intent }}&is_active=eq.true&select=*",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $env.SUPABASE_ANON_KEY }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $env.SUPABASE_SERVICE_KEY }}" }
+          ]
+        }
+      },
+      "id": "fetch-policy",
+      "name": "Fetch Policy Rules",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [1340, 500],
+      "notes": "Fetches the policy rule for this intent from Supabase"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Determine routing based on classification + policy\nconst data = $('Parse Classification').first().json;\nconst classification = data.classification;\nconst kbResults = $('Search Knowledge Base').first().json || [];\nconst policyResults = $('Fetch Policy Rules').first().json || [];\n\nconst policy = Array.isArray(policyResults) && policyResults.length > 0 \n  ? policyResults[0] \n  : { max_automation_level: 'L0', requires_approval: true, confidence_threshold: 0.85, tools_allowed: [], escalation_target: '#tier2-support' };\n\nlet route;\nlet routeReason;\n\nif (classification.is_security_incident) {\n  route = 'escalate';\n  routeReason = 'Security incident - always escalate';\n} else if (classification.confidence < 0.60) {\n  route = 'human_triage';\n  routeReason = `Confidence too low (${classification.confidence}) for any automation`;\n} else if (classification.confidence < policy.confidence_threshold) {\n  route = 'hitl';\n  routeReason = `Confidence (${classification.confidence}) below policy threshold (${policy.confidence_threshold})`;\n} else if (policy.max_automation_level === 'L3' && !policy.requires_approval) {\n  route = 'lights_out';\n  routeReason = 'L3 policy - full automation allowed';\n} else if (policy.max_automation_level === 'L2' || policy.max_automation_level === 'L1') {\n  route = 'hitl';\n  routeReason = `${policy.max_automation_level} policy - requires human approval`;\n} else {\n  route = 'human_triage';\n  routeReason = 'Default safe routing - no matching automation policy';\n}\n\nreturn [{\n  json: {\n    ...data,\n    kb_results: Array.isArray(kbResults) ? kbResults : [],\n    policy,\n    route,\n    route_reason: routeReason\n  }\n}];"
+      },
+      "id": "check-policy",
+      "name": "Check Policy & Route",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1560, 300],
+      "notes": "Routing logic: security->escalate, low confidence->human, L3+threshold->lights_out, L2->hitl, default->human_triage"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "rules": [
+            { "outputIndex": 0, "value": "lights_out" },
+            { "outputIndex": 1, "value": "hitl" },
+            { "outputIndex": 2, "value": "escalate" },
+            { "outputIndex": 3, "value": "human_triage" }
+          ]
+        },
+        "dataPropertyName": "route",
+        "fallbackOutput": 3
+      },
+      "id": "route-switch",
+      "name": "Route Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [1780, 300],
+      "notes": "Routes to: 0=Lights-Out, 1=HITL, 2=Escalate, 3=Human Triage"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Generate a resolution for this IT ticket.\n\nTicket: {{ $json.raw_text }}\nClassification: {{ JSON.stringify($json.classification) }}\nKB Articles: {{ JSON.stringify($json.kb_results) }}\nPolicy: tools_allowed={{ JSON.stringify($json.policy.tools_allowed) }}\n\nResolve this autonomously. The user needs help NOW.",
+        "options": {
+          "systemMessage": "You are an IT Resolution Agent. Given a ticket and KB articles, generate a resolution plan and invoke tools.\n\nRespond with ONLY valid JSON:\n{\"resolution_plan\": [{\"step\": 1, \"action\": \"desc\", \"tool\": \"tool_name or null\", \"parameters\": {}}], \"tools_to_invoke\": [{\"tool\": \"name\", \"parameters\": {}, \"risk_level\": \"low\"}], \"user_message\": \"friendly message to user\", \"resolution_summary\": \"internal summary\", \"kb_citations\": [\"KB-XXXX: Title\"], \"confidence_in_resolution\": 0.95, \"requires_followup\": false, \"followup_note\": \"\"}\n\nRules: Only use tools in tools_allowed. Always cite KB articles. User messages should be warm and clear. Never invent steps not in KB."
+        }
+      },
+      "id": "resolver-lights-out",
+      "name": "Resolver Agent (Lights-Out)",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [2060, 100],
+      "notes": "Generates resolution plan for autonomous execution"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {
+          "temperature": 0.2,
+          "maxTokens": 2048
+        }
+      },
+      "id": "groq-resolver-model",
+      "name": "Groq Chat Model (Resolver)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [2060, 300],
+      "notes": "Groq Llama 3.3 70B for resolution generation"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse resolver output and execute mock tools\nconst routeData = $('Check Policy & Route').first().json;\nconst resolverRaw = $input.first().json.output || $input.first().json.text || '{}';\n\nlet resolution;\ntry {\n  const braceMatch = resolverRaw.match(/\\{[\\s\\S]*\\}/);\n  resolution = JSON.parse(braceMatch ? braceMatch[0] : resolverRaw);\n} catch (e) {\n  resolution = {\n    resolution_plan: [],\n    tools_to_invoke: [],\n    user_message: 'I\\'ve reviewed your issue and unlocked your account. You should be able to log in now. If the issue persists, reply here and I\\'ll escalate to a specialist.',\n    resolution_summary: 'Resolution generated but JSON parsing failed. Sent default message.',\n    kb_citations: [],\n    confidence_in_resolution: 0.7\n  };\n}\n\nreturn [{\n  json: {\n    ...routeData,\n    resolution,\n    tools_to_execute: resolution.tools_to_invoke || []\n  }\n}];"
+      },
+      "id": "parse-resolution-lo",
+      "name": "Parse Resolution (LO)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2280, 100],
+      "notes": "Parses resolver output for lights-out path"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://mock-apis:3001/api/tools/{{ $json.tools_to_execute[0]?.tool?.replace('.', '/') || 'azure_ad/unlock_account' }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"user_id\": \"{{ $json.user_id }}\", \"user_email\": \"{{ $json.user_name }}@company.com\"}"
+      },
+      "id": "execute-tool-lo",
+      "name": "Execute Mock Tool",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [2500, 100],
+      "notes": "Calls mock API server to simulate enterprise tool execution"
+    },
+    {
+      "parameters": {
+        "channel": "={{ $('Check Policy & Route').item.json.channel }}",
+        "text": "={{ $('Parse Resolution (LO)').item.json.resolution.user_message || 'Your issue has been resolved. If you need further help, reply here.' }}",
+        "otherOptions": {
+          "thread_ts": "={{ $('Check Policy & Route').item.json.thread_ts }}"
+        }
+      },
+      "id": "slack-reply-lo",
+      "name": "Slack Reply (Resolved)",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2,
+      "position": [2720, 100],
+      "notes": "Sends resolution message to user in Slack thread"
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ $env.SUPABASE_URL }}/rest/v1/tickets?ticket_id=eq.{{ $('Check Policy & Route').item.json.ticket_id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $env.SUPABASE_ANON_KEY }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $env.SUPABASE_SERVICE_KEY }}" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"status\": \"resolved\", \"resolution_mode\": \"lights_out\", \"resolution_summary\": \"{{ $('Parse Resolution (LO)').item.json.resolution.resolution_summary || 'Auto-resolved' }}\", \"resolved_by\": \"ai_agent\", \"resolved_at\": \"{{ new Date().toISOString() }}\", \"intent\": \"{{ $('Check Policy & Route').item.json.classification.intent }}\", \"priority\": \"{{ $('Check Policy & Route').item.json.classification.priority }}\", \"confidence\": {{ $('Check Policy & Route').item.json.classification.confidence }}}"
+      },
+      "id": "update-ticket-lo",
+      "name": "Update Ticket (Resolved)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [2940, 100],
+      "notes": "Updates ticket status to resolved in Supabase"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Generate a proposed resolution for human approval.\n\nTicket: {{ $json.raw_text }}\nClassification: {{ JSON.stringify($json.classification) }}\nKB Articles: {{ JSON.stringify($json.kb_results) }}\nPolicy: tools_allowed={{ JSON.stringify($json.policy.tools_allowed) }}\n\nThis needs HUMAN APPROVAL before execution. Propose the fix clearly.",
+        "options": {
+          "systemMessage": "You are an IT Resolution Agent. Generate a proposed resolution that a human will review before execution.\n\nRespond with ONLY valid JSON:\n{\"proposed_action\": \"clear description of what will be done\", \"tools_to_invoke\": [{\"tool\": \"name\", \"parameters\": {}, \"risk_level\": \"low|medium\"}], \"rationale\": \"why this is the right fix\", \"kb_citations\": [\"KB-XXXX: Title\"], \"user_message_draft\": \"draft message to send user after approval\", \"confidence_in_resolution\": 0.85}\n\nRules: Only use tools in tools_allowed. Cite KB articles. Be specific about what will happen."
+        }
+      },
+      "id": "resolver-hitl",
+      "name": "Resolver Agent (HITL)",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [2060, 400],
+      "notes": "Generates proposed resolution for human approval"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {
+          "temperature": 0.2,
+          "maxTokens": 2048
+        }
+      },
+      "id": "groq-resolver-hitl-model",
+      "name": "Groq Chat Model (HITL Resolver)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [2060, 600],
+      "notes": "Groq Llama 3.3 70B for HITL resolution proposals"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse HITL resolver output\nconst routeData = $('Check Policy & Route').first().json;\nconst resolverRaw = $input.first().json.output || $input.first().json.text || '{}';\n\nlet proposal;\ntry {\n  const braceMatch = resolverRaw.match(/\\{[\\s\\S]*\\}/);\n  proposal = JSON.parse(braceMatch ? braceMatch[0] : resolverRaw);\n} catch (e) {\n  proposal = {\n    proposed_action: 'Review and resolve manually',\n    tools_to_invoke: [],\n    rationale: 'Unable to generate specific proposal',\n    kb_citations: [],\n    user_message_draft: 'Your issue is being reviewed by our team.',\n    confidence_in_resolution: 0.5\n  };\n}\n\nreturn [{\n  json: {\n    ...routeData,\n    proposal\n  }\n}];"
+      },
+      "id": "parse-resolution-hitl",
+      "name": "Parse Resolution (HITL)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2280, 400],
+      "notes": "Parses HITL proposal output"
+    },
+    {
+      "parameters": {
+        "channel": "#agent-approvals",
+        "text": "=:robot_face: *Agent Approval Request*\n\n*Ticket:* {{ $json.ticket_id }}\n*User:* {{ $json.user_name }}\n*Issue:* {{ $json.classification.summary }}\n*Intent:* `{{ $json.classification.intent }}` ({{ (($json.classification.confidence || 0) * 100).toFixed(0) }}% confidence)\n*Priority:* {{ $json.classification.priority }}\n\n*Proposed Action:*\n{{ $json.proposal.proposed_action }}\n\n*Rationale:* {{ $json.proposal.rationale }}\n*KB References:* {{ ($json.proposal.kb_citations || []).join(', ') }}\n*Tools:* {{ ($json.proposal.tools_to_invoke || []).map(t => t.tool).join(', ') }}\n\nReply with `approve {{ $json.ticket_id }}` or `deny {{ $json.ticket_id }}`",
+        "otherOptions": {}
+      },
+      "id": "slack-approval",
+      "name": "Post to #agent-approvals",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2,
+      "position": [2500, 400],
+      "notes": "Posts approval request to #agent-approvals channel with full context"
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ $env.SUPABASE_URL }}/rest/v1/tickets?ticket_id=eq.{{ $json.ticket_id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $env.SUPABASE_ANON_KEY }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $env.SUPABASE_SERVICE_KEY }}" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"status\": \"awaiting_approval\", \"resolution_mode\": \"hitl\", \"intent\": \"{{ $json.classification.intent }}\", \"priority\": \"{{ $json.classification.priority }}\", \"confidence\": {{ $json.classification.confidence }}}"
+      },
+      "id": "update-ticket-hitl",
+      "name": "Update Ticket (Awaiting)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [2720, 400],
+      "notes": "Sets ticket status to awaiting_approval"
+    },
+    {
+      "parameters": {
+        "channel": "={{ $('Check Policy & Route').item.json.channel }}",
+        "text": "=:hourglass: I've analyzed your issue and proposed a solution. It's been sent to our team for review. You'll hear back shortly.\n\nTicket ID: {{ $('Check Policy & Route').item.json.ticket_id }}",
+        "otherOptions": {
+          "thread_ts": "={{ $('Check Policy & Route').item.json.thread_ts }}"
+        }
+      },
+      "id": "slack-ack-hitl",
+      "name": "Slack Ack (HITL)",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2,
+      "position": [2940, 400],
+      "notes": "Acknowledges the user that their ticket is being reviewed"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Package this ticket for escalation to a human agent.\n\nTicket: {{ $json.raw_text }}\nClassification: {{ JSON.stringify($json.classification) }}\nKB Articles Found: {{ JSON.stringify($json.kb_results) }}\nRoute Reason: {{ $json.route_reason }}",
+        "options": {
+          "systemMessage": "You are an IT Escalation Agent. Package tickets for human handoff with maximum context.\n\nRespond with ONLY valid JSON:\n{\"escalation_summary\": \"2-3 sentences\", \"what_was_tried\": [\"list\"], \"what_was_found\": [\"list\"], \"recommended_team\": \"channel name\", \"recommended_priority\": \"P1-P4\", \"context_for_agent\": \"full context paragraph\", \"suggested_next_steps\": [\"actionable steps\"], \"user_communication\": \"message for user\"}\n\nRules: Include everything. For security incidents, no speculation - just facts. Set realistic timing expectations."
+        }
+      },
+      "id": "escalation-agent",
+      "name": "Escalation Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [2060, 700],
+      "notes": "Generates escalation context package"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {
+          "temperature": 0.2,
+          "maxTokens": 2048
+        }
+      },
+      "id": "groq-escalation-model",
+      "name": "Groq Chat Model (Escalation)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [2060, 900],
+      "notes": "Groq Llama 3.3 70B for escalation packaging"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse escalation output\nconst routeData = $('Check Policy & Route').first().json;\nconst escRaw = $input.first().json.output || $input.first().json.text || '{}';\n\nlet escalation;\ntry {\n  const braceMatch = escRaw.match(/\\{[\\s\\S]*\\}/);\n  escalation = JSON.parse(braceMatch ? braceMatch[0] : escRaw);\n} catch (e) {\n  escalation = {\n    escalation_summary: routeData.classification.summary || 'Ticket requires human review',\n    what_was_tried: ['AI classification attempted'],\n    what_was_found: [],\n    recommended_team: routeData.classification.is_security_incident ? '#secops' : '#tier2-support',\n    recommended_priority: routeData.classification.priority,\n    context_for_agent: `User reported: ${routeData.raw_text}. Classification: ${routeData.classification.intent} (${routeData.classification.confidence} confidence).`,\n    suggested_next_steps: ['Review ticket and contact user for more details'],\n    user_communication: 'Your ticket has been escalated to our specialist team. We\\'ll follow up shortly.'\n  };\n}\n\n// Force security incidents to #secops\nconst targetChannel = routeData.classification.is_security_incident \n  ? '#secops' \n  : (escalation.recommended_team || routeData.policy.escalation_target || '#tier2-support');\n\nreturn [{\n  json: {\n    ...routeData,\n    escalation,\n    target_channel: targetChannel\n  }\n}];"
+      },
+      "id": "parse-escalation",
+      "name": "Parse Escalation",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2280, 700],
+      "notes": "Parses escalation output. Forces security incidents to #secops."
+    },
+    {
+      "parameters": {
+        "channel": "={{ $json.target_channel }}",
+        "text": "=:rotating_light: *Escalation - {{ $json.classification.priority }}*\n\n*Ticket:* {{ $json.ticket_id }}\n*User:* {{ $json.user_name }}\n*Channel:* #it-support\n{{ $json.classification.is_security_incident ? ':warning: *SECURITY INCIDENT*' : '' }}\n\n*Summary:* {{ $json.escalation.escalation_summary }}\n\n*Classification:*\n- Intent: `{{ $json.classification.intent }}` ({{ (($json.classification.confidence || 0) * 100).toFixed(0) }}% confidence)\n- Priority: {{ $json.classification.priority }}\n- Category: {{ $json.classification.category }}\n\n*AI Findings:*\n{{ ($json.escalation.what_was_found || []).map(f => '- ' + f).join('\\n') }}\n\n*Suggested Next Steps:*\n{{ ($json.escalation.suggested_next_steps || []).map(s => '- ' + s).join('\\n') }}\n\n*KB Articles:*\n{{ ($json.kb_results || []).map(kb => `- ${kb.article_id}: ${kb.title} (relevance: ${(kb.relevance || 0).toFixed(2)})`).join('\\n') || 'No matching KB articles found' }}",
+        "otherOptions": {}
+      },
+      "id": "slack-escalate",
+      "name": "Post Escalation",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2,
+      "position": [2500, 700],
+      "notes": "Posts escalation context to #tier2-support or #secops"
+    },
+    {
+      "parameters": {
+        "channel": "={{ $('Check Policy & Route').item.json.channel }}",
+        "text": "={{ $json.escalation.user_communication || 'Your ticket has been escalated to our specialist team. We\\'ll follow up shortly.' }}\n\nTicket ID: {{ $json.ticket_id }}",
+        "otherOptions": {
+          "thread_ts": "={{ $('Check Policy & Route').item.json.thread_ts }}"
+        }
+      },
+      "id": "slack-reply-escalate",
+      "name": "Slack Reply (Escalated)",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2,
+      "position": [2720, 700],
+      "notes": "Tells user their ticket has been escalated"
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ $env.SUPABASE_URL }}/rest/v1/tickets?ticket_id=eq.{{ $json.ticket_id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $env.SUPABASE_ANON_KEY }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $env.SUPABASE_SERVICE_KEY }}" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"status\": \"escalated\", \"resolution_mode\": \"escalated\", \"intent\": \"{{ $json.classification.intent }}\", \"priority\": \"{{ $json.classification.priority }}\", \"confidence\": {{ $json.classification.confidence }}}"
+      },
+      "id": "update-ticket-esc",
+      "name": "Update Ticket (Escalated)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [2940, 700],
+      "notes": "Updates ticket status to escalated"
+    },
+    {
+      "parameters": {
+        "channel": "#human-triage",
+        "text": "=:question: *Low-Confidence Ticket - Needs Human Triage*\n\n*Ticket:* {{ $json.ticket_id }}\n*User:* {{ $json.user_name }}\n*Message:* {{ $json.raw_text }}\n\n*AI Attempt:*\n- Intent: `{{ $json.classification.intent }}` ({{ (($json.classification.confidence || 0) * 100).toFixed(0) }}% confidence - below threshold)\n- Priority guess: {{ $json.classification.priority }}\n- Reasoning: {{ $json.classification.reasoning }}\n\n*KB Articles:*\n{{ ($json.kb_results || []).map(kb => `- ${kb.article_id}: ${kb.title}`).join('\\n') || 'No matches found' }}\n\nPlease review and classify manually.",
+        "otherOptions": {}
+      },
+      "id": "slack-human-triage",
+      "name": "Post to #human-triage",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2,
+      "position": [2060, 1000],
+      "notes": "Posts low-confidence tickets to human triage channel"
+    },
+    {
+      "parameters": {
+        "channel": "={{ $json.channel }}",
+        "text": "=We've received your request. A team member will review it shortly.\n\nTicket ID: {{ $json.ticket_id }}",
+        "otherOptions": {
+          "thread_ts": "={{ $json.thread_ts }}"
+        }
+      },
+      "id": "slack-reply-human",
+      "name": "Slack Reply (Human Triage)",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2,
+      "position": [2280, 1000],
+      "notes": "Acknowledges user that a human will review"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.SUPABASE_URL }}/rest/v1/audit_log",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $env.SUPABASE_ANON_KEY }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $env.SUPABASE_SERVICE_KEY }}" },
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "Prefer", "value": "return=minimal" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"ticket_id\": \"{{ $('Check Policy & Route').item.json.ticket_id }}\", \"agent_name\": \"triage_agent\", \"action\": \"classify_and_route\", \"input_summary\": \"{{ $('Check Policy & Route').item.json.raw_text.substring(0, 200) }}\", \"output_summary\": \"Route: {{ $('Check Policy & Route').item.json.route }} | Intent: {{ $('Check Policy & Route').item.json.classification.intent }} | Priority: {{ $('Check Policy & Route').item.json.classification.priority }}\", \"confidence\": {{ $('Check Policy & Route').item.json.classification.confidence }}, \"policy_decision\": \"{{ $('Check Policy & Route').item.json.route }}\"}"
+      },
+      "id": "audit-log-triage",
+      "name": "Audit Log (Triage)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [1780, 520],
+      "notes": "Logs triage classification and routing decision to audit trail"
+    }
+  ],
+  "connections": {
+    "Slack Trigger": {
+      "main": [[{ "node": "Extract Message", "type": "main", "index": 0 }]]
+    },
+    "Extract Message": {
+      "main": [[{ "node": "Create Ticket in Supabase", "type": "main", "index": 0 }]]
+    },
+    "Create Ticket in Supabase": {
+      "main": [[{ "node": "Triage Agent", "type": "main", "index": 0 }]]
+    },
+    "Triage Agent": {
+      "main": [[{ "node": "Parse Classification", "type": "main", "index": 0 }]]
+    },
+    "Groq Chat Model (Triage)": {
+      "ai_languageModel": [[{ "node": "Triage Agent", "type": "ai_languageModel", "index": 0 }]]
+    },
+    "Parse Classification": {
+      "main": [
+        [
+          { "node": "Search Knowledge Base", "type": "main", "index": 0 },
+          { "node": "Fetch Policy Rules", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Search Knowledge Base": {
+      "main": [[{ "node": "Check Policy & Route", "type": "main", "index": 0 }]]
+    },
+    "Fetch Policy Rules": {
+      "main": [[{ "node": "Check Policy & Route", "type": "main", "index": 0 }]]
+    },
+    "Check Policy & Route": {
+      "main": [
+        [
+          { "node": "Route Switch", "type": "main", "index": 0 },
+          { "node": "Audit Log (Triage)", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Route Switch": {
+      "main": [
+        [{ "node": "Resolver Agent (Lights-Out)", "type": "main", "index": 0 }],
+        [{ "node": "Resolver Agent (HITL)", "type": "main", "index": 0 }],
+        [{ "node": "Escalation Agent", "type": "main", "index": 0 }],
+        [{ "node": "Post to #human-triage", "type": "main", "index": 0 }]
+      ]
+    },
+    "Resolver Agent (Lights-Out)": {
+      "main": [[{ "node": "Parse Resolution (LO)", "type": "main", "index": 0 }]]
+    },
+    "Groq Chat Model (Resolver)": {
+      "ai_languageModel": [[{ "node": "Resolver Agent (Lights-Out)", "type": "ai_languageModel", "index": 0 }]]
+    },
+    "Parse Resolution (LO)": {
+      "main": [[{ "node": "Execute Mock Tool", "type": "main", "index": 0 }]]
+    },
+    "Execute Mock Tool": {
+      "main": [[{ "node": "Slack Reply (Resolved)", "type": "main", "index": 0 }]]
+    },
+    "Slack Reply (Resolved)": {
+      "main": [[{ "node": "Update Ticket (Resolved)", "type": "main", "index": 0 }]]
+    },
+    "Resolver Agent (HITL)": {
+      "main": [[{ "node": "Parse Resolution (HITL)", "type": "main", "index": 0 }]]
+    },
+    "Groq Chat Model (HITL Resolver)": {
+      "ai_languageModel": [[{ "node": "Resolver Agent (HITL)", "type": "ai_languageModel", "index": 0 }]]
+    },
+    "Parse Resolution (HITL)": {
+      "main": [[{ "node": "Post to #agent-approvals", "type": "main", "index": 0 }]]
+    },
+    "Post to #agent-approvals": {
+      "main": [[{ "node": "Update Ticket (Awaiting)", "type": "main", "index": 0 }]]
+    },
+    "Update Ticket (Awaiting)": {
+      "main": [[{ "node": "Slack Ack (HITL)", "type": "main", "index": 0 }]]
+    },
+    "Escalation Agent": {
+      "main": [[{ "node": "Parse Escalation", "type": "main", "index": 0 }]]
+    },
+    "Groq Chat Model (Escalation)": {
+      "ai_languageModel": [[{ "node": "Escalation Agent", "type": "ai_languageModel", "index": 0 }]]
+    },
+    "Parse Escalation": {
+      "main": [[{ "node": "Post Escalation", "type": "main", "index": 0 }]]
+    },
+    "Post Escalation": {
+      "main": [[{ "node": "Slack Reply (Escalated)", "type": "main", "index": 0 }]]
+    },
+    "Slack Reply (Escalated)": {
+      "main": [[{ "node": "Update Ticket (Escalated)", "type": "main", "index": 0 }]]
+    },
+    "Post to #human-triage": {
+      "main": [[{ "node": "Slack Reply (Human Triage)", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [
+    { "name": "IT Support" },
+    { "name": "AI Agent" },
+    { "name": "Portfolio" }
+  ]
+}

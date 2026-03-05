@@ -1,0 +1,138 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 680" font-family="'Courier New', Courier, monospace">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#6b7a90"/>
+    </marker>
+    <marker id="arrow-green" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#00e5a0"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="680" fill="#0C0F14" rx="8"/>
+
+  <!-- Title -->
+  <text x="450" y="32" text-anchor="middle" fill="#e8edf5" font-size="14" font-weight="bold">IT Support Triage &amp; Resolution Agent - Architecture</text>
+
+  <!-- USER LAYER -->
+  <rect x="260" y="50" width="380" height="50" rx="4" fill="none" stroke="#611F69" stroke-width="1.5"/>
+  <text x="450" y="68" text-anchor="middle" fill="#611F69" font-size="9" letter-spacing="2">USER LAYER</text>
+  <text x="450" y="86" text-anchor="middle" fill="#e8edf5" font-size="11">Slack #it-support  |  (Teams, Email, Portal)</text>
+
+  <!-- Arrow down -->
+  <line x1="450" y1="100" x2="450" y2="130" stroke="#6b7a90" stroke-width="1" marker-end="url(#arrow)"/>
+  <text x="468" y="120" fill="#6b7a90" font-size="8">Webhook</text>
+
+  <!-- ORCHESTRATION LAYER -->
+  <rect x="60" y="130" width="780" height="280" rx="4" fill="none" stroke="#FF6D5A" stroke-width="1.5"/>
+  <text x="450" y="150" text-anchor="middle" fill="#FF6D5A" font-size="9" letter-spacing="2">ORCHESTRATION LAYER (n8n)</text>
+
+  <!-- Triage Agent -->
+  <rect x="100" y="170" width="160" height="60" rx="3" fill="#1a1f28" stroke="#FF6B35" stroke-width="1"/>
+  <text x="180" y="192" text-anchor="middle" fill="#FF6B35" font-size="9" letter-spacing="1">TRIAGE AGENT</text>
+  <text x="180" y="210" text-anchor="middle" fill="#6b7a90" font-size="8">Groq / Llama 3.3 70B</text>
+  <text x="180" y="222" text-anchor="middle" fill="#6b7a90" font-size="8">Intent + Priority + Confidence</text>
+
+  <!-- Retrieval Agent -->
+  <rect x="300" y="170" width="160" height="60" rx="3" fill="#1a1f28" stroke="#3ECF8E" stroke-width="1"/>
+  <text x="380" y="192" text-anchor="middle" fill="#3ECF8E" font-size="9" letter-spacing="1">RETRIEVAL AGENT</text>
+  <text x="380" y="210" text-anchor="middle" fill="#6b7a90" font-size="8">Supabase pgvector</text>
+  <text x="380" y="222" text-anchor="middle" fill="#6b7a90" font-size="8">KB Search + Citations</text>
+
+  <!-- Policy Check -->
+  <rect x="500" y="170" width="160" height="60" rx="3" fill="#1a1f28" stroke="#ffd93d" stroke-width="1"/>
+  <text x="580" y="192" text-anchor="middle" fill="#ffd93d" font-size="9" letter-spacing="1">POLICY CHECK</text>
+  <text x="580" y="210" text-anchor="middle" fill="#6b7a90" font-size="8">Intent Whitelist</text>
+  <text x="580" y="222" text-anchor="middle" fill="#6b7a90" font-size="8">Confidence Threshold</text>
+
+  <!-- Arrows between agents -->
+  <line x1="260" y1="200" x2="300" y2="200" stroke="#6b7a90" stroke-width="1" marker-end="url(#arrow)"/>
+  <line x1="460" y1="200" x2="500" y2="200" stroke="#6b7a90" stroke-width="1" marker-end="url(#arrow)"/>
+
+  <!-- Route Switch -->
+  <rect x="700" y="170" width="120" height="60" rx="3" fill="#1a1f28" stroke="#00e5a0" stroke-width="1"/>
+  <text x="760" y="192" text-anchor="middle" fill="#00e5a0" font-size="9" letter-spacing="1">ROUTE</text>
+  <text x="760" y="210" text-anchor="middle" fill="#6b7a90" font-size="8">L3 | L2 | Esc</text>
+  <line x1="660" y1="200" x2="700" y2="200" stroke="#6b7a90" stroke-width="1" marker-end="url(#arrow)"/>
+
+  <!-- Three branches -->
+  <!-- L3 Branch -->
+  <rect x="100" y="270" width="200" height="50" rx="3" fill="#1a1f28" stroke="#00e5a0" stroke-width="1"/>
+  <text x="200" y="290" text-anchor="middle" fill="#00e5a0" font-size="9" letter-spacing="1">L3 LIGHTS-OUT</text>
+  <text x="200" y="304" text-anchor="middle" fill="#6b7a90" font-size="8">Auto-resolve + Slack reply</text>
+
+  <!-- L2 Branch -->
+  <rect x="350" y="270" width="200" height="50" rx="3" fill="#1a1f28" stroke="#ffd93d" stroke-width="1"/>
+  <text x="450" y="290" text-anchor="middle" fill="#ffd93d" font-size="9" letter-spacing="1">L2 HITL</text>
+  <text x="450" y="304" text-anchor="middle" fill="#6b7a90" font-size="8">#approvals -> Wait -> Execute</text>
+
+  <!-- Escalate Branch -->
+  <rect x="600" y="270" width="200" height="50" rx="3" fill="#1a1f28" stroke="#ff4d6a" stroke-width="1"/>
+  <text x="700" y="290" text-anchor="middle" fill="#ff4d6a" font-size="9" letter-spacing="1">ESCALATE</text>
+  <text x="700" y="304" text-anchor="middle" fill="#6b7a90" font-size="8">#tier2 / #secops + context</text>
+
+  <!-- Route arrows -->
+  <line x1="730" y1="230" x2="200" y2="270" stroke="#00e5a0" stroke-width="1" marker-end="url(#arrow-green)" stroke-dasharray="4,3"/>
+  <line x1="760" y1="230" x2="450" y2="270" stroke="#6b7a90" stroke-width="1" marker-end="url(#arrow)" stroke-dasharray="4,3"/>
+  <line x1="790" y1="230" x2="700" y2="270" stroke="#6b7a90" stroke-width="1" marker-end="url(#arrow)" stroke-dasharray="4,3"/>
+
+  <!-- Notify Agent -->
+  <rect x="300" y="350" width="300" height="40" rx="3" fill="#1a1f28" stroke="#611F69" stroke-width="1"/>
+  <text x="450" y="370" text-anchor="middle" fill="#611F69" font-size="9" letter-spacing="1">NOTIFY (Slack)</text>
+  <text x="450" y="383" text-anchor="middle" fill="#6b7a90" font-size="8">User reply + Audit log entry</text>
+
+  <!-- Arrows down to notify -->
+  <line x1="200" y1="320" x2="370" y2="350" stroke="#6b7a90" stroke-width="1" marker-end="url(#arrow)"/>
+  <line x1="450" y1="320" x2="450" y2="350" stroke="#6b7a90" stroke-width="1" marker-end="url(#arrow)"/>
+  <line x1="700" y1="320" x2="530" y2="350" stroke="#6b7a90" stroke-width="1" marker-end="url(#arrow)"/>
+
+  <!-- INFRASTRUCTURE LAYER -->
+  <text x="450" y="440" text-anchor="middle" fill="#3a4455" font-size="9" letter-spacing="2">INFRASTRUCTURE</text>
+
+  <!-- Groq Box -->
+  <rect x="80" y="460" width="200" height="80" rx="4" fill="#1a1f28" stroke="#FF6B35" stroke-width="1.5"/>
+  <text x="180" y="482" text-anchor="middle" fill="#FF6B35" font-size="10" font-weight="bold">Groq API</text>
+  <text x="180" y="498" text-anchor="middle" fill="#e8edf5" font-size="9">Llama 3.3 70B</text>
+  <text x="180" y="514" text-anchor="middle" fill="#6b7a90" font-size="8">FREE TIER</text>
+  <text x="180" y="530" text-anchor="middle" fill="#00e5a0" font-size="8">Real AI inference</text>
+
+  <!-- Supabase Box -->
+  <rect x="350" y="460" width="200" height="80" rx="4" fill="#1a1f28" stroke="#3ECF8E" stroke-width="1.5"/>
+  <text x="450" y="482" text-anchor="middle" fill="#3ECF8E" font-size="10" font-weight="bold">Supabase</text>
+  <text x="450" y="498" text-anchor="middle" fill="#e8edf5" font-size="9">Postgres + pgvector</text>
+  <text x="450" y="514" text-anchor="middle" fill="#6b7a90" font-size="8">FREE TIER</text>
+  <text x="450" y="530" text-anchor="middle" fill="#00e5a0" font-size="8">Real DB + search</text>
+
+  <!-- Mock APIs Box -->
+  <rect x="620" y="460" width="200" height="80" rx="4" fill="#1a1f28" stroke="#6b7a90" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="720" y="482" text-anchor="middle" fill="#6b7a90" font-size="10" font-weight="bold">Mock Tool APIs</text>
+  <text x="720" y="498" text-anchor="middle" fill="#e8edf5" font-size="9">Azure AD, Okta, SCCM</text>
+  <text x="720" y="514" text-anchor="middle" fill="#6b7a90" font-size="8">localhost:3001</text>
+  <text x="720" y="530" text-anchor="middle" fill="#ff9f43" font-size="8">Mock (labeled)</text>
+
+  <!-- Arrows from orchestration to infra -->
+  <line x1="180" y1="410" x2="180" y2="460" stroke="#FF6B35" stroke-width="1" marker-end="url(#arrow)" stroke-dasharray="3,3"/>
+  <line x1="380" y1="390" x2="450" y2="460" stroke="#3ECF8E" stroke-width="1" marker-end="url(#arrow)" stroke-dasharray="3,3"/>
+  <line x1="520" y1="390" x2="720" y2="460" stroke="#6b7a90" stroke-width="1" marker-end="url(#arrow)" stroke-dasharray="3,3"/>
+
+  <!-- Legend -->
+  <rect x="80" y="570" width="740" height="80" rx="4" fill="#0e1219" stroke="#3a4455" stroke-width="1"/>
+  <text x="100" y="590" fill="#3a4455" font-size="9" letter-spacing="1">LEGEND</text>
+
+  <circle cx="110" cy="610" r="5" fill="#00e5a0"/>
+  <text x="122" y="614" fill="#e8edf5" font-size="9">Real AI inference</text>
+
+  <circle cx="260" cy="610" r="5" fill="#3ECF8E"/>
+  <text x="272" y="614" fill="#e8edf5" font-size="9">Real DB + search</text>
+
+  <circle cx="410" cy="610" r="5" fill="#FF6D5A"/>
+  <text x="422" y="614" fill="#e8edf5" font-size="9">Real orchestration</text>
+
+  <circle cx="570" cy="610" r="5" fill="#611F69"/>
+  <text x="582" y="614" fill="#e8edf5" font-size="9">Real Slack</text>
+
+  <circle cx="670" cy="610" r="5" fill="none" stroke="#6b7a90" stroke-width="1" stroke-dasharray="2,2"/>
+  <text x="682" y="614" fill="#ff9f43" font-size="9">Mock tools (labeled)</text>
+
+  <text x="450" y="640" text-anchor="middle" fill="#3a4455" font-size="8">Total infrastructure cost: $0  |  Groq free tier + n8n self-hosted + Supabase free tier</text>
+</svg>
