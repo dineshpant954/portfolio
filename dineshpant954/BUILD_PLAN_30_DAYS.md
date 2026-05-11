@@ -1,32 +1,32 @@
 # 30-Day Build Plan
 
-- Day 1: meaningful portfolio contribution
-- Day 2: meaningful portfolio contribution
-- Day 3: meaningful portfolio contribution
-- Day 4: meaningful portfolio contribution
-- Day 5: meaningful portfolio contribution
-- Day 6: meaningful portfolio contribution
-- Day 7: meaningful portfolio contribution
-- Day 8: meaningful portfolio contribution
-- Day 9: meaningful portfolio contribution
-- Day 10: meaningful portfolio contribution
-- Day 11: meaningful portfolio contribution
-- Day 12: meaningful portfolio contribution
-- Day 13: meaningful portfolio contribution
-- Day 14: meaningful portfolio contribution
-- Day 15: meaningful portfolio contribution
-- Day 16: meaningful portfolio contribution
-- Day 17: meaningful portfolio contribution
-- Day 18: meaningful portfolio contribution
-- Day 19: meaningful portfolio contribution
-- Day 20: meaningful portfolio contribution
-- Day 21: meaningful portfolio contribution
-- Day 22: meaningful portfolio contribution
-- Day 23: meaningful portfolio contribution
-- Day 24: meaningful portfolio contribution
-- Day 25: meaningful portfolio contribution
-- Day 26: meaningful portfolio contribution
-- Day 27: meaningful portfolio contribution
-- Day 28: meaningful portfolio contribution
-- Day 29: meaningful portfolio contribution
-- Day 30: meaningful portfolio contribution
+- Day 1: Publish profile README with positioning and repository links.
+- Day 2: Draft control tower system architecture in `/docs/architecture.md`.
+- Day 3: Expand synthetic project dataset with 20+ workflow rows.
+- Day 4: Build CLI for risk scoring with input/output file arguments.
+- Day 5: Add RAID log generation categories (Risk, Assumption, Issue, Dependency).
+- Day 6: Add executive summary formatter with red/amber/green trends.
+- Day 7: Define eval criteria and thresholds in `product/eval_plan.md`.
+- Day 8: Add unit tests for risk scoring edge cases.
+- Day 9: Add GitHub Actions to run tests automatically.
+- Day 10: Capture first screenshots of CLI outputs and docs.
+- Day 11: Add travel intent taxonomy and class labels.
+- Day 12: Expand synthetic travel event data with loyalty and channel fields.
+- Day 13: Add segmentation logic tests and confusion review notes.
+- Day 14: Document privacy constraints and synthetic-data policy.
+- Day 15: Add job tracker ingestion script and schema validation.
+- Day 16: Improve fit scoring with weighted keyword categories.
+- Day 17: Add ATS keyword extraction examples and limitations.
+- Day 18: Add dashboard view (table + fit score filters).
+- Day 19: Expand RAG document set and question-answer pairs.
+- Day 20: Add retrieval baseline comparison (keyword vs simple tf-idf).
+- Day 21: Add grounding score and answer coverage metric outputs.
+- Day 22: Track eval runtime and approximate cost fields.
+- Day 23: Polish AI PM toolkit PRD and eval templates with examples.
+- Day 24: Add governance checklist for human-in-the-loop rollout.
+- Day 25: Write case study narrative for control tower outcomes.
+- Day 26: Add agentic workflow experiment notes (memory, tool use, guardrails).
+- Day 27: Add safety failure modes and mitigation table.
+- Day 28: Record short demo scripts for each repository.
+- Day 29: Triage repo issues and prioritize next sprint backlog.
+- Day 30: Publish portfolio retrospective and next 30-day roadmap.
