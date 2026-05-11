@@ -1,0 +1,32 @@
+# 30-Day Build Plan
+
+- Day 1: meaningful portfolio contribution
+- Day 2: meaningful portfolio contribution
+- Day 3: meaningful portfolio contribution
+- Day 4: meaningful portfolio contribution
+- Day 5: meaningful portfolio contribution
+- Day 6: meaningful portfolio contribution
+- Day 7: meaningful portfolio contribution
+- Day 8: meaningful portfolio contribution
+- Day 9: meaningful portfolio contribution
+- Day 10: meaningful portfolio contribution
+- Day 11: meaningful portfolio contribution
+- Day 12: meaningful portfolio contribution
+- Day 13: meaningful portfolio contribution
+- Day 14: meaningful portfolio contribution
+- Day 15: meaningful portfolio contribution
+- Day 16: meaningful portfolio contribution
+- Day 17: meaningful portfolio contribution
+- Day 18: meaningful portfolio contribution
+- Day 19: meaningful portfolio contribution
+- Day 20: meaningful portfolio contribution
+- Day 21: meaningful portfolio contribution
+- Day 22: meaningful portfolio contribution
+- Day 23: meaningful portfolio contribution
+- Day 24: meaningful portfolio contribution
+- Day 25: meaningful portfolio contribution
+- Day 26: meaningful portfolio contribution
+- Day 27: meaningful portfolio contribution
+- Day 28: meaningful portfolio contribution
+- Day 29: meaningful portfolio contribution
+- Day 30: meaningful portfolio contribution
