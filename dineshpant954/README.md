@@ -1,0 +1,72 @@
+# Hi, I'm Dinesh 👋
+
+AI Product Builder | Kelley MBA | ex-Amadeus + Vertiv  
+I build practical AI agents, RAG workflows, and automation tools for travel, enterprise operations, and AI product workflows.
+
+### What I’m building
+- AI agents for workflow automation, research, and decision support
+- RAG systems for enterprise knowledge retrieval
+- PM-grade AI product artifacts: PRDs, eval plans, success metrics, rollout plans
+- Tools that turn messy workflows into usable products
+
+### Featured Builds
+- AI Program Control Tower
+- Travel Intent Agent
+- Job Feed Dashboard
+- RAG Eval Lab
+- AI PM Toolkit
+- Agentic Workflows Lab
+
+### Current focus
+Building practical AI products and documenting the product thinking behind them.
+
+### Tech I use
+Python, SQL, Streamlit, Pandas, GitHub Actions, Prompt design, RAG patterns.
+
+### Product thinking
+Start from user pain, prototype quickly, evaluate rigorously, and ship with clear rollout + governance.
+
+### Featured repositories
+- [ai-program-control-tower](../ai-program-control-tower)
+- [travel-intent-agent](../travel-intent-agent)
+- [job-feed-dashboard](../job-feed-dashboard)
+- [rag-eval-lab](../rag-eval-lab)
+- [ai-pm-toolkit](../ai-pm-toolkit)
+- [agentic-workflows-lab](../agentic-workflows-lab)
+
+### How I work
+discovery → prototype → eval → product artifact → iteration
+
+### 30-day build plan
+See [BUILD_PLAN_30_DAYS.md](BUILD_PLAN_30_DAYS.md).
+
+- Day 1: Publish profile README with positioning and repository links.
+- Day 2: Draft control tower system architecture in `/docs/architecture.md`.
+- Day 3: Expand synthetic project dataset with 20+ workflow rows.
+- Day 4: Build CLI for risk scoring with input/output file arguments.
+- Day 5: Add RAID log generation categories (Risk, Assumption, Issue, Dependency).
+- Day 6: Add executive summary formatter with red/amber/green trends.
+- Day 7: Define eval criteria and thresholds in `product/eval_plan.md`.
+- Day 8: Add unit tests for risk scoring edge cases.
+- Day 9: Add GitHub Actions to run tests automatically.
+- Day 10: Capture first screenshots of CLI outputs and docs.
+- Day 11: Add travel intent taxonomy and class labels.
+- Day 12: Expand synthetic travel event data with loyalty and channel fields.
+- Day 13: Add segmentation logic tests and confusion review notes.
+- Day 14: Document privacy constraints and synthetic-data policy.
+- Day 15: Add job tracker ingestion script and schema validation.
+- Day 16: Improve fit scoring with weighted keyword categories.
+- Day 17: Add ATS keyword extraction examples and limitations.
+- Day 18: Add dashboard view (table + fit score filters).
+- Day 19: Expand RAG document set and question-answer pairs.
+- Day 20: Add retrieval baseline comparison (keyword vs simple tf-idf).
+- Day 21: Add grounding score and answer coverage metric outputs.
+- Day 22: Track eval runtime and approximate cost fields.
+- Day 23: Polish AI PM toolkit PRD and eval templates with examples.
+- Day 24: Add governance checklist for human-in-the-loop rollout.
+- Day 25: Write case study narrative for control tower outcomes.
+- Day 26: Add agentic workflow experiment notes (memory, tool use, guardrails).
+- Day 27: Add safety failure modes and mitigation table.
+- Day 28: Record short demo scripts for each repository.
+- Day 29: Triage repo issues and prioritize next sprint backlog.
+- Day 30: Publish portfolio retrospective and next 30-day roadmap.
