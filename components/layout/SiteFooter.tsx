@@ -1,0 +1,2 @@
+import { site } from '@/content/site';
+export function SiteFooter(){return <footer className='mt-20 border-t'><div className='mx-auto max-w-6xl px-4 py-10 text-sm text-neutral-600'><p className='mb-3'>Thoughtful product leadership at the intersection of AI, strategy, and execution.</p><div className='flex gap-4'><a href={site.social.linkedin}>LinkedIn</a><a href={site.social.github}>GitHub</a><a href={site.social.email}>Email</a></div><p className='mt-6'>© {new Date().getFullYear()} Dinesh Pant</p></div></footer>}

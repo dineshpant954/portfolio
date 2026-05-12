@@ -1,0 +1,13 @@
+export type ExperienceEntry = { title: string; bullets: string[] };
+
+export const experienceIntro = 'A mix of enterprise product delivery, payments and travel infrastructure, agentic AI design, and cross-functional execution — engineer-trained, PM-shaped, MBA-finished.';
+
+export const experienceEntries: ExperienceEntry[] = [
+  { title: 'Vertiv — AI Product & Strategy', bullets: ['Shipped four agentic workflows across IT Ops, Sales Ops, Finance, and Sales Enablement using Groq, n8n, Supabase, Python, and RAG', 'Translated fragmented enterprise data into autonomous decision and execution layers', 'Partnered with business stakeholders to scope, prioritize, and demonstrate ROI for AI-native tooling'] },
+  { title: 'Amadeus Labs — SWE → APM → PM (2019–2024)', bullets: ['Defined checkout payment flow requirements and B2B wallet integration logic, partnering with risk, fraud, and compliance teams to reduce payment failure rates by 18% and enable $150M+ in annual transaction volume', 'Owned OTA integration and distribution-channel logic for the hospitality CRS platform, launching 12 new channel connections and increasing direct booking volume by 22% across partner hotel chains', 'Drove airline distribution work across NDC and GDS standards, balancing legacy infrastructure with modern API-driven commerce', 'Bridged engineering and product fluently, having shipped the systems before owning the roadmap'] },
+  { title: 'Microsoft — Product / Engineering', bullets: ['Worked on platform features in a global engineering organization', 'Collaborated with PM, design, and engineering across geographies', 'Strengthened technical fluency on cloud and enterprise stacks'] },
+  { title: 'Beats by Dre — Product / Strategy', bullets: ['Contributed to consumer product strategy and execution', 'Operated across hardware-adjacent product surfaces and brand-led teams', 'Developed sharper instinct for craft, polish, and user-perceived quality'] },
+  { title: 'Kelley School of Business, Indiana University — MBA (May 2026)', bullets: ['Finance and Marketing & Strategy concentrations. VP of the Kelley Tech Club and Consulting Academy. Coursework in corporate finance, fixed income, supply chain strategy, and entrepreneurship — including capstones on Apple supply chain and an ETA analysis of Louisville Vegan Jerky Co.'] }
+];
+
+export const capabilities = ['Product Strategy', 'AI / Agentic Product Thinking', 'Technical Program Management', 'RAG & LLM Applications', 'Internal Tools & Workflow Design', 'Payments & FinTech', 'Travel Tech (NDC, GDS, CRS, OTA)', 'Enterprise Platforms', 'Data & Analytics', 'Cross-functional Execution', 'User-Centered Problem Solving'];
