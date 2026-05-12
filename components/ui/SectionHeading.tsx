@@ -1,0 +1,1 @@
+export function SectionHeading({title,intro}:{title:string;intro?:string}){return <div className="mb-8"><h2 className="text-3xl font-semibold tracking-tight">{title}</h2>{intro&&<p className="mt-3 max-w-3xl text-neutral-700">{intro}</p>}</div>}

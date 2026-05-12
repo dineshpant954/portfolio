@@ -1,0 +1,2 @@
+import Link from 'next/link'; import { Post } from '@/content/posts';
+export function PostCard({post}:{post:Post}){return <article className="rounded-2xl border bg-white p-6"><p className="text-sm text-neutral-500">{post.date} · {post.readingTime}</p><h3 className="mt-2 text-xl font-semibold">{post.title}</h3><p className="mt-2 text-sm text-neutral-700">{post.excerpt}</p><Link href={`/writing/${post.slug}`} className="mt-4 inline-block text-accent">Read essay →</Link></article>}
