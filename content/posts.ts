@@ -1,0 +1,6 @@
+export type Post={slug:string;title:string;date:string;category:string;excerpt:string;readingTime:string;body:string[]};
+export const posts:Post[]=[
+{slug:'internal-ai-tool-usable',title:'What makes an internal AI tool actually usable',date:'2026-04-03',category:'Product + AI',excerpt:'Adoption, trust, and the difference between a demo and a daily-driver.',readingTime:'6 min read',body:['Usability in internal AI tooling is mostly about confidence loops.','Teams adopt tools that fit existing workflows and reduce decision friction.']},
+{slug:'building-agentic-workflows-without-noise',title:'Building agentic workflows that save time without creating new noise',date:'2026-03-16',category:'Agentic Systems',excerpt:'When to automate, when to assist, when to leave alone.',readingTime:'7 min read',body:['Automation should remove toil, not create monitoring debt.','Assistive patterns work best when humans keep high-leverage approvals.']},
+{slug:'enterprise-discipline-for-ai-native-products',title:'What enterprise product discipline adds to AI-native products',date:'2026-02-11',category:'Enterprise Product',excerpt:'Lessons from shipping in regulated, high-stakes systems.',readingTime:'8 min read',body:['Enterprise discipline adds reliability, observability, and rollout rigor.','AI-native products get better when product ops is treated as core architecture.']}
+];

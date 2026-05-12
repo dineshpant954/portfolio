@@ -1,0 +1,3 @@
+import Link from 'next/link';import { notFound } from 'next/navigation';import { posts } from '@/content/posts';import { Container } from '@/components/ui/Container';
+export function generateStaticParams(){return posts.map(p=>({slug:p.slug}))}
+export default async function Page({params}:{params:Promise<{slug:string}>}){const {slug}=await params;const post=posts.find(p=>p.slug===slug);if(!post)return notFound();return <main className='py-16'><Container><article className='prose max-w-3xl'><Link href='/writing'>← Back to writing</Link><h1>{post.title}</h1><p>{post.date} · {post.category} · {post.readingTime}</p>{post.body.map(b=><p key={b}>{b}</p>)}</article></Container></main>}

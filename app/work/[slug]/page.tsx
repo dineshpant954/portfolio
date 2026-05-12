@@ -1,0 +1,4 @@
+import { notFound } from 'next/navigation';import { projects } from '@/content/projects';import { Container } from '@/components/ui/Container';
+export function generateStaticParams(){return projects.map(p=>({slug:p.slug}))}
+export default async function Page({params}:{params:Promise<{slug:string}>}){const {slug}=await params;const project=projects.find(p=>p.slug===slug);if(!project)return notFound();
+return <main className='py-16'><Container><h1 className='text-4xl font-semibold'>{project.title}</h1><p className='mt-4'>{project.summary}</p>{['Overview','Problem','Why it mattered','Role','Approach','Key decisions','Outcomes','Next steps'].map(s=><section key={s} className='mt-8'><h2 className='text-2xl font-semibold'>{s}</h2><p className='mt-2 text-neutral-700'>Detailed narrative for {s.toLowerCase()} with realistic enterprise context, tradeoffs, and execution details.</p></section>)}</Container></main>}
